@@ -50,15 +50,15 @@ export const WorkoutCard: React.FC<WorkoutCardProps> = ({ workout, calculate1RM 
       {workout.type === 'airbike' && (
         <div className="grid grid-cols-3 gap-4 text-sm">
           <div>
-            <div className="text-gray-400">Čas</div>
+            <div className="text-gray-400">Time</div>
             <div className="font-bold">{workout.time} min</div>
           </div>
           <div>
-            <div className="text-gray-400">Kalorie</div>
+            <div className="text-gray-400">Calories</div>
             <div className="font-bold">{workout.calories} kcal</div>
           </div>
           <div>
-            <div className="text-gray-400">Vzdálenost</div>
+            <div className="text-gray-400">Distance</div>
             <div className="font-bold">{workout.distance} km</div>
           </div>
         </div>

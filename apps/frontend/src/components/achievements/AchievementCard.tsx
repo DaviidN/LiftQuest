@@ -28,7 +28,7 @@ export const AchievementCard: React.FC<AchievementCardProps> = ({ achievement, u
           <div className="text-sm text-gray-300">{achievement.desc}</div>
           {unlocked && (
             <div className="mt-2 text-xs text-yellow-400 font-semibold">
-              ✓ ODEMČENO
+              ✓ UNLOCKED
             </div>
           )}
         </div>

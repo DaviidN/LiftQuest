@@ -21,11 +21,11 @@ export const LevelCard: React.FC<LevelCardProps> = ({
           <Trophy className="w-8 h-8 text-yellow-400" />
           <div>
             <div className="text-2xl font-bold">Level {level}</div>
-            <div className="text-sm text-gray-300">{totalXP} XP celkem</div>
+            <div className="text-sm text-gray-300">{totalXP} total XP</div>
           </div>
         </div>
         <div className="text-right">
-          <div className="text-sm text-gray-300">Do dalšího levelu</div>
+          <div className="text-sm text-gray-300">To next level</div>
           <div className="font-bold">{xpForNext - totalXP} XP</div>
         </div>
       </div>

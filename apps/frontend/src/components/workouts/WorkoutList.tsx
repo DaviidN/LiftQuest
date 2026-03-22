@@ -13,7 +13,7 @@ export const WorkoutList: React.FC<WorkoutListProps> = ({ workouts, calculate1RM
     return (
       <div className="bg-white/10 backdrop-blur-lg rounded-xl p-12 text-center">
         <Dumbbell className="w-16 h-16 mx-auto mb-4 text-gray-400" />
-        <p className="text-gray-400">Zatím žádné tréninky. Začni přidáním prvního!</p>
+        <p className="text-gray-400">No workouts yet. Start by adding your first!</p>
       </div>
     );
   }

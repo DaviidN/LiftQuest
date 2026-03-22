@@ -170,7 +170,7 @@ const WorkoutTracker = () => {
     }));
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 text-white p-4">
+    <div className="min-h-screen w-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 text-white">
       {/* Achievement Notification */}
       {newAchievement && (
         <AchievementNotification
@@ -179,7 +179,7 @@ const WorkoutTracker = () => {
       )}
 
       {/* Header */}
-      <div className="max-w-6xl mx-auto mb-6">
+      <div className="w-full mb-6 p-2">
         <Header onAddWorkout={() => setShowAddWorkout(true)} />
         <LevelCard
           level={level}
@@ -190,12 +190,12 @@ const WorkoutTracker = () => {
       </div>
 
       {/* Navigation */}
-      <div className="max-w-6xl mx-auto mb-6">
+      <div className="w-full mb-6 p-2">
         <Navigation activeTab={activeTab} onTabChange={setActiveTab} />
       </div>
 
       {/* Main Content */}
-      <div className="max-w-6xl mx-auto">
+      <div className="w-full p-2">
         {activeTab === 'dashboard' && (
           <Dashboard
             strengthWorkouts={strengthWorkouts.length}

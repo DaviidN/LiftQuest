@@ -21,7 +21,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
         <StatsCard
           icon={Dumbbell}
-          label="Silové tréninky"
+          label="Weight workouts"
           value={strengthWorkouts}
           iconColor="text-purple-400"
         />
@@ -33,7 +33,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
         />
         <StatsCard
           icon={Flame}
-          label="Současný streak"
+          label="Current streak"
           value={currentStreak}
           iconColor="text-orange-400"
         />

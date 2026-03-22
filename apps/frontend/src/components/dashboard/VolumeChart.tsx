@@ -10,7 +10,7 @@ export const VolumeChart: React.FC<VolumeChartProps> = ({ data }) => {
 
   return (
     <div className="bg-white/10 backdrop-blur-lg rounded-xl p-6 mb-6">
-      <h3 className="text-xl font-bold mb-4">Objem (poslední 30 dní)</h3>
+      <h3 className="text-xl font-bold mb-4">Volume (last 30 days)</h3>
       <ResponsiveContainer width="100%" height={300}>
         <BarChart data={data}>
           <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
