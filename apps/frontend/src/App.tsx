@@ -40,7 +40,7 @@ const WorkoutTracker = () => {
     }));
   }, [workouts, totalXP, unlockedAchievements]);
 
-  const checkAchievements = (newWorkouts: Workout[], earnedXP: number) => {
+  const checkAchievements = (newWorkouts: Workout[]) => {
     const unlocked: string[] = [...unlockedAchievements];
     let newUnlocks: string[] = [];
 
@@ -121,7 +121,7 @@ const WorkoutTracker = () => {
     const newWorkouts = [...workouts, { ...workout, id: Date.now(), xpEarned }];
     setWorkouts(newWorkouts);
     setTotalXP(totalXP + xpEarned);
-    checkAchievements(newWorkouts, xpEarned);
+    checkAchievements(newWorkouts);
     setShowAddWorkout(false);
   };
 

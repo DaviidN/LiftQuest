@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Dumbbell, Activity, X } from 'lucide-react';
 import type { Workout } from '../../types/workout.types';
+import { Button } from '../UI/Button';
 
 type AddWorkoutModalProps = {
   onClose: () => void;
@@ -87,15 +88,15 @@ export const AddWorkoutModal: React.FC<AddWorkoutModalProps> = ({ onClose, onAdd
       <div className="bg-slate-800 rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
         <div className="p-6">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold">Nový trénink</h2>
-            <button onClick={onClose} className="text-gray-400 hover:text-white">
-              <X className="w-6 h-6" />
-            </button>
+            <h2 className="text-2xl font-bold">New workout</h2>
+            <Button onClick={onClose} variant='secondary'>
+              <X/>
+            </Button>
           </div>
 
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium mb-2">Datum</label>
+              <label className="block text-sm font-medium mb-2">Date</label>
               <input
                 type="date"
                 value={date}
@@ -105,30 +106,32 @@ export const AddWorkoutModal: React.FC<AddWorkoutModalProps> = ({ onClose, onAdd
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-2">Typ tréninku</label>
+              <label className="block text-sm font-medium mb-2">Workout type</label>
               <div className="flex gap-2">
-                <button
+                <Button
                   onClick={() => setWorkoutType('strength')}
+                  size='lg'
                   className={`flex-1 py-2 rounded-lg transition-all ${
                     workoutType === 'strength'
                       ? 'bg-purple-500'
                       : 'bg-slate-700 hover:bg-slate-600'
-                  }`}
+                  } `}
                 >
-                  <Dumbbell className="w-5 h-5 mx-auto mb-1" />
-                  Silový
-                </button>
-                <button
+                  <Dumbbell/>
+                  Strength
+                </Button>
+                <Button
                   onClick={() => setWorkoutType('airbike')}
-                  className={`flex-1 py-2 rounded-lg transition-all ${
+                  size='lg'
+                  className={`flex-1 py-2 rounded-lg transition-all  ${
                     workoutType === 'airbike'
                       ? 'bg-pink-500'
                       : 'bg-slate-700 hover:bg-slate-600'
-                  }`}
+                  } `}
                 >
-                  <Activity className="w-5 h-5 mx-auto mb-1" />
+                  <Activity/>
                   Airbike
-                </button>
+                </Button>
               </div>
             </div>
 
@@ -138,7 +141,7 @@ export const AddWorkoutModal: React.FC<AddWorkoutModalProps> = ({ onClose, onAdd
                   <div key={exIndex} className="bg-slate-700 rounded-lg p-4">
                     <input
                       type="text"
-                      placeholder="Název cviku (dřep, bench...)"
+                      placeholder="Name of the exercise (squat, bench...)"
                       value={exercise.name}
                       onChange={(e) => updateExercise(exIndex, 'name', e.target.value)}
                       className="w-full bg-slate-600 rounded px-3 py-2 mb-3 focus:outline-none focus:ring-2 focus:ring-purple-500"
@@ -148,41 +151,42 @@ export const AddWorkoutModal: React.FC<AddWorkoutModalProps> = ({ onClose, onAdd
                       <div key={setIndex} className="flex gap-2 mb-2">
                         <input
                           type="number"
-                          placeholder="Váha (kg)"
+                          placeholder="Weight (kg)"
                           value={set.weight}
                           onChange={(e) => updateSet(exIndex, setIndex, 'weight', e.target.value)}
-                          className="flex-1 bg-slate-600 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                          className="w-full flex-1 bg-slate-600 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
                         />
                         <input
                           type="number"
-                          placeholder="Opakování"
+                          placeholder="Repetitions"
                           value={set.reps}
                           onChange={(e) => updateSet(exIndex, setIndex, 'reps', e.target.value)}
-                          className="flex-1 bg-slate-600 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                          className="w-full flex-1 bg-slate-600 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
                         />
                       </div>
                     ))}
-                    
-                    <button
+
+                    <Button
                       onClick={() => addSet(exIndex)}
-                      className="text-sm text-purple-400 hover:text-purple-300 mt-2"
+                      variant='tertiary'
                     >
-                      + Přidat sérii
-                    </button>
+                      + Add set
+                    </Button>
                   </div>
                 ))}
                 
-                <button
+                <Button
                   onClick={addExercise}
-                  className="w-full py-2 border-2 border-dashed border-gray-600 rounded-lg hover:border-purple-500 hover:bg-purple-500/10 transition-all"
+                  variant='tertiary'
+                  fullWidth
                 >
-                  + Přidat cvik
-                </button>
+                  + Add exercise
+                </Button>
               </div>
             ) : (
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium mb-2">Čas (minuty)</label>
+                  <label className="block text-sm font-medium mb-2">Time (minutes)</label>
                   <input
                     type="number"
                     value={time}
@@ -191,7 +195,7 @@ export const AddWorkoutModal: React.FC<AddWorkoutModalProps> = ({ onClose, onAdd
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-2">Kalorie</label>
+                  <label className="block text-sm font-medium mb-2">Calories</label>
                   <input
                     type="number"
                     value={calories}
@@ -200,7 +204,7 @@ export const AddWorkoutModal: React.FC<AddWorkoutModalProps> = ({ onClose, onAdd
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-2">Vzdálenost (km)</label>
+                  <label className="block text-sm font-medium mb-2">Distance (km)</label>
                   <input
                     type="number"
                     step="0.1"
@@ -214,18 +218,19 @@ export const AddWorkoutModal: React.FC<AddWorkoutModalProps> = ({ onClose, onAdd
           </div>
 
           <div className="flex gap-3 mt-6">
-            <button
+            <Button
+              variant='secondary'
               onClick={onClose}
-              className="flex-1 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg transition-all"
+              className="flex-1"
             >
-              Zrušit
-            </button>
-            <button
+              Cancel
+            </Button>
+            <Button
               onClick={handleSubmit}
-              className="flex-1 py-2 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 rounded-lg transition-all"
+              className="flex-1"
             >
-              Uložit
-            </button>
+              Save
+            </Button>
           </div>
         </div>
       </div>
