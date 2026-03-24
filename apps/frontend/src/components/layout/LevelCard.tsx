@@ -1,7 +1,7 @@
 import React from 'react';
 import { Trophy } from 'lucide-react';
 
-type LevelCardProps = {
+interface LevelCardProps {
   level: number;
   totalXP: number;
   xpForNext: number;

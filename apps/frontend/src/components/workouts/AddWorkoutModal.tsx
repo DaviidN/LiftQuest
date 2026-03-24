@@ -3,18 +3,28 @@ import { Dumbbell, Activity, X } from 'lucide-react';
 import type { Workout } from '../../types/workout.types';
 import { Button } from '../UI/Button';
 
-type AddWorkoutModalProps = {
+interface AddWorkoutModalProps {
   onClose: () => void;
   onAdd: (workout: Workout) => void;
 };
+
+type StrengthExerciseName = 'Squat' | 'Bench Press' | 'Deadlift';
+
+interface StrengthExercise {
+  name: StrengthExerciseName;
+  sets: {
+    weight: string;
+    reps: string;
+  }[];
+}
 
 export const AddWorkoutModal: React.FC<AddWorkoutModalProps> = ({ onClose, onAdd }) => {
   const [workoutType, setWorkoutType] = useState<'strength' | 'airbike'>('strength');
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
   
   // Strength workout state
-  const [exercises, setExercises] = useState([
-    { name: '', sets: [{ weight: '', reps: '' }] }
+  const [exercises, setExercises] = useState<StrengthExercise[]>([
+    { name: 'Squat', sets: [{ weight: '', reps: '' }] }
   ]);
   
   // Airbike state
@@ -23,7 +33,7 @@ export const AddWorkoutModal: React.FC<AddWorkoutModalProps> = ({ onClose, onAdd
   const [distance, setDistance] = useState('');
 
   const addExercise = () => {
-    setExercises([...exercises, { name: '', sets: [{ weight: '', reps: '' }] }]);
+    setExercises([...exercises, { name: 'Squat', sets: [{ weight: '', reps: '' }] }]);
   };
 
   const addSet = (exerciseIndex: number) => {
@@ -32,7 +42,7 @@ export const AddWorkoutModal: React.FC<AddWorkoutModalProps> = ({ onClose, onAdd
     setExercises(newExercises);
   };
 
-  const updateExercise = (index: number, field: string, value: string) => {
+  const updateExercise = (index: number, field: string, value: StrengthExerciseName) => {
     const newExercises = [...exercises];
     if (field === 'name') {
       newExercises[index].name = value;
@@ -139,25 +149,37 @@ export const AddWorkoutModal: React.FC<AddWorkoutModalProps> = ({ onClose, onAdd
               <div className="space-y-4">
                 {exercises.map((exercise, exIndex) => (
                   <div key={exIndex} className="bg-slate-700 rounded-lg p-4">
-                    <input
-                      type="text"
-                      placeholder="Name of the exercise (squat, bench...)"
+                    <select
                       value={exercise.name}
-                      onChange={(e) => updateExercise(exIndex, 'name', e.target.value)}
+                      onChange={(e) => updateExercise(exIndex, 'name', e.target.value as "Squat" | "Bench Press" | "Deadlift")}
                       className="w-full bg-slate-600 rounded px-3 py-2 mb-3 focus:outline-none focus:ring-2 focus:ring-purple-500"
-                    />
+                    >
+                      <option value="Squat">Squat</option>
+                      <option value="Bench Press">Bench Press</option>
+                      <option value="Deadlift">Deadlift</option>
+                    </select>
                     
                     {exercise.sets.map((set, setIndex) => (
                       <div key={setIndex} className="flex gap-2 mb-2">
                         <input
-                          type="number"
+                          type="text"
+                          inputMode="numeric"
+                          onInput={(e) => {
+                            const input = e.target as HTMLInputElement;
+                            input.value = input.value.replace(/[^0-9]/g, '');
+                          }}
                           placeholder="Weight (kg)"
                           value={set.weight}
                           onChange={(e) => updateSet(exIndex, setIndex, 'weight', e.target.value)}
                           className="w-full flex-1 bg-slate-600 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
                         />
                         <input
-                          type="number"
+                          type="text"
+                          inputMode="numeric"
+                          onInput={(e) => {
+                            const input = e.target as HTMLInputElement;
+                            input.value = input.value.replace(/[^0-9]/g, '');
+                          }}
                           placeholder="Repetitions"
                           value={set.reps}
                           onChange={(e) => updateSet(exIndex, setIndex, 'reps', e.target.value)}
@@ -188,7 +210,12 @@ export const AddWorkoutModal: React.FC<AddWorkoutModalProps> = ({ onClose, onAdd
                 <div>
                   <label className="block text-sm font-medium mb-2">Time (minutes)</label>
                   <input
-                    type="number"
+                    type="text"
+                    inputMode="numeric"
+                    onInput={(e) => {
+                      const input = e.target as HTMLInputElement;
+                      input.value = input.value.replace(/[^0-9]/g, '');
+                    }}
                     value={time}
                     onChange={(e) => setTime(e.target.value)}
                     className="w-full bg-slate-700 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-pink-500"
@@ -197,7 +224,12 @@ export const AddWorkoutModal: React.FC<AddWorkoutModalProps> = ({ onClose, onAdd
                 <div>
                   <label className="block text-sm font-medium mb-2">Calories</label>
                   <input
-                    type="number"
+                    type="text"
+                    inputMode="numeric"
+                    onInput={(e) => {
+                      const input = e.target as HTMLInputElement;
+                      input.value = input.value.replace(/[^0-9]/g, '');
+                    }}
                     value={calories}
                     onChange={(e) => setCalories(e.target.value)}
                     className="w-full bg-slate-700 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-pink-500"
@@ -206,8 +238,12 @@ export const AddWorkoutModal: React.FC<AddWorkoutModalProps> = ({ onClose, onAdd
                 <div>
                   <label className="block text-sm font-medium mb-2">Distance (km)</label>
                   <input
-                    type="number"
-                    step="0.1"
+                    type="text"
+                    inputMode="numeric"
+                    onInput={(e) => {
+                      const input = e.target as HTMLInputElement;
+                      input.value = input.value.replace(/[^0-9]/g, '');
+                    }}
                     value={distance}
                     onChange={(e) => setDistance(e.target.value)}
                     className="w-full bg-slate-700 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-pink-500"

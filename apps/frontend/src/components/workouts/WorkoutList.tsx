@@ -3,10 +3,10 @@ import { Dumbbell } from 'lucide-react';
 import type { Workout } from '../../types/workout.types';
 import { WorkoutCard } from './WorkoutCard';
 
-type WorkoutListProps = {
+interface WorkoutListProps {
   workouts: Workout[];
   calculate1RM: (weight: number, reps: number) => number;
-};
+}
 
 export const WorkoutList: React.FC<WorkoutListProps> = ({ workouts, calculate1RM }) => {
   if (workouts.length === 0) {

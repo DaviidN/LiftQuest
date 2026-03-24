@@ -19,7 +19,7 @@ export const WorkoutCard: React.FC<WorkoutCardProps> = ({ workout, calculate1RM 
               <Activity className="w-5 h-5 text-pink-400" />
             )}
             <span className="font-bold">
-              {workout.type === 'strength' ? 'Silový trénink' : 'Airbike'}
+              {workout.type === 'strength' ? 'Strength Workout' : 'Airbike'}
             </span>
           </div>
           <div className="text-sm text-gray-400">

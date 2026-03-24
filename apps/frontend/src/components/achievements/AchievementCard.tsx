@@ -7,7 +7,7 @@ type Achievement = {
   icon: string;
 };
 
-type AchievementCardProps = {
+interface AchievementCardProps {
   achievement: Achievement;
   unlocked: boolean;
 };

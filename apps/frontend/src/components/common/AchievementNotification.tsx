@@ -1,9 +1,9 @@
 import React from 'react';
 import { Award } from 'lucide-react';
 
-type AchievementNotificationProps = {
+interface AchievementNotificationProps {
   achievementName: string;
-};
+}
 
 export const AchievementNotification: React.FC<AchievementNotificationProps> = ({
   achievementName

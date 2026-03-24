@@ -4,7 +4,7 @@ import type { LucideIcon } from 'lucide-react';
 type ButtonVariant = 'primary' | 'secondary' | 'tertiary' | 'ghost' | 'outline';
 type ButtonSize = 'sm' | 'md' | 'lg';
 
-type ButtonProps = {
+interface ButtonProps {
   children: React.ReactNode;
   onClick?: () => void;
   variant?: ButtonVariant;
@@ -14,7 +14,7 @@ type ButtonProps = {
   disabled?: boolean;
   type?: 'button' | 'submit' | 'reset';
   fullWidth?: boolean;
-};
+}
 
 export const Button: React.FC<ButtonProps> = ({
   children,

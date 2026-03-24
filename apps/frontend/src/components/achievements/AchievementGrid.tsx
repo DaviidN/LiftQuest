@@ -8,7 +8,7 @@ type Achievement = {
   icon: string;
 };
 
-type AchievementGridProps = {
+interface AchievementGridProps {
   achievements: Achievement[];
   unlockedAchievements: string[];
 };

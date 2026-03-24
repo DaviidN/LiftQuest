@@ -1,9 +1,9 @@
 import React from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
-type VolumeChartProps = {
+interface VolumeChartProps {
   data: Array<{ date: string; volume: number }>;
-};
+}
 
 export const VolumeChart: React.FC<VolumeChartProps> = ({ data }) => {
   if (data.length === 0) return null;
@@ -17,9 +17,9 @@ export const VolumeChart: React.FC<VolumeChartProps> = ({ data }) => {
           <XAxis dataKey="date" stroke="#9ca3af" />
           <YAxis stroke="#9ca3af" />
           <Tooltip
-            contentStyle={{ backgroundColor: '#1f2937', border: 'none', borderRadius: '8px' }}
+            contentStyle={{ backgroundColor: '#1f2937', border: 'none', borderRadius: '8px' }} cursor={false}
           />
-          <Bar dataKey="volume" fill="#8b5cf6" />
+          <Bar dataKey="volume" fill="#8b5cf6" activeBar={{ fill: '#a78bfa' }} />
         </BarChart>
       </ResponsiveContainer>
     </div>

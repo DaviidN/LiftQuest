@@ -1,10 +1,10 @@
 import React from 'react';
 import { Button } from '../UI/Button';
 
-type NavigationProps = {
+interface NavigationProps {
   activeTab: string;
   onTabChange: (tab: string) => void;
-};
+}
 
 export const Navigation: React.FC<NavigationProps> = ({ activeTab, onTabChange }) => {
   const tabs = [

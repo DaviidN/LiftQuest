@@ -1,12 +1,12 @@
 import React from 'react';
 import type { LucideIcon } from 'lucide-react';
 
-type StatsCardProps = {
+interface StatsCardProps {
   icon: LucideIcon;
   label: string;
   value: number;
   iconColor: string;
-};
+}
 
 export const StatsCard: React.FC<StatsCardProps> = ({ icon: Icon, label, value, iconColor }) => {
   return (
