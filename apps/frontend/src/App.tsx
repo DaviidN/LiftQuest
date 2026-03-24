@@ -11,17 +11,27 @@ import { WorkoutList } from './components/workouts/WorkoutList';
 import { AddWorkoutModal } from './components/workouts/AddWorkoutModal';
 import { AchievementGrid } from './components/achievements/AchievementGrid';
 import { AchievementNotification } from './components/common/AchievementNotification';
+import { LoginModal } from './components/auth/LoginModal';
+
+export interface Session {
+    id: number;
+    token: string;
+    name: string;
+  }
 
 const WorkoutTracker = () => {
   const [workouts, setWorkouts] = useState<Workout[]>([]);
   const [totalXP, setTotalXP] = useState(0);
   const [unlockedAchievements, setUnlockedAchievements] = useState<string[]>([]);
   const [showAddWorkout, setShowAddWorkout] = useState(false);
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  const[userSess, setUserSess]= useState<Session[]>([]);
   const [activeTab, setActiveTab] = useState('dashboard');
-  const [newAchievement, setNewAchievement] = useState<string | null>(null);+
+  const [newAchievement, setNewAchievement] = useState<string | null>(null);
 
   // Load data from localStorage
   useEffect(() => {
+    getUser();  
     const saved = localStorage.getItem('workoutData');
     if (saved) {
       const data = JSON.parse(saved);
@@ -169,6 +179,15 @@ const WorkoutTracker = () => {
       )
     }));
 
+    function getUser() {
+      const sessionString = localStorage.getItem("session");
+      if (!sessionString) {
+          return null;
+      }
+
+      return setUserSess([JSON.parse(sessionString)]);
+    }
+
   return (
     <div className="min-h-screen w-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 text-white">
       {/* Achievement Notification */}
@@ -180,7 +199,7 @@ const WorkoutTracker = () => {
 
       {/* Header */}
       <div className="w-full mb-6 p-2">
-        <Header onAddWorkout={() => setShowAddWorkout(true)} />
+        <Header user={userSess} onHeaderBtnClick={() => !userSess[0] ? setShowLoginModal(true) : setShowAddWorkout(true)} />
         <LevelCard
           level={level}
           totalXP={totalXP}
@@ -222,6 +241,22 @@ const WorkoutTracker = () => {
         <AddWorkoutModal
           onClose={() => setShowAddWorkout(false)}
           onAdd={addWorkout}
+        />
+      )}
+      {showLoginModal && (
+        <LoginModal
+          onClose={() => setShowLoginModal(false)}
+          onLogin={async () => {
+            // Mock login function
+            const mockSession = {
+              id: 1,
+              token: 'mock-token',
+              name: 'John Doe'
+            };
+            localStorage.setItem("session", JSON.stringify(mockSession));
+            setUserSess([mockSession]);
+            setShowLoginModal(false); 
+          }}
         />
       )}
     </div>
