@@ -80,6 +80,7 @@ export const AddWorkoutModal: React.FC<AddWorkoutModalProps> = ({ onClose, onAdd
         date,
         exercises: validExercises
       });
+      onClose();
     } else {
       if (!time || !calories || !distance) return;
       
@@ -90,6 +91,7 @@ export const AddWorkoutModal: React.FC<AddWorkoutModalProps> = ({ onClose, onAdd
         calories: parseInt(calories),
         distance: parseFloat(distance)
       });
+      onClose();
     }
   };
 

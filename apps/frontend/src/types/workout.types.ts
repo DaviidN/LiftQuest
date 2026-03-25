@@ -14,6 +14,7 @@ export type StrengthWorkout = {
   date: string;
   exercises: StrengthExercise[];
   xpEarned?: number;
+  prAchieved?: boolean;
 };
 
 export type AirbikeWorkout = {

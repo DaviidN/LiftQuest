@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import type { Workout } from './types/workout.types';
 import { calculate1RM, calculateLevel, getXPForNextLevel } from './utils/calculations';
 import { ACHIEVEMENTS } from './constants/achievements';
+import { CircleQuestionMark } from 'lucide-react';
 
 import { Header } from './components/layout/Header';
 import { LevelCard } from './components/layout/LevelCard';
@@ -11,47 +12,19 @@ import { WorkoutList } from './components/workouts/WorkoutList';
 import { AddWorkoutModal } from './components/workouts/AddWorkoutModal';
 import { AchievementGrid } from './components/achievements/AchievementGrid';
 import { AchievementNotification } from './components/common/AchievementNotification';
-import { LoginModal } from './components/auth/LoginModal';
-
-export interface Session {
-    id: number;
-    token: string;
-    name: string;
-  }
+import { AuthModal } from './components/auth/AuthModal';
+import { useAuth } from './context/userSessContext';
 
 const WorkoutTracker = () => {
-  const [workouts, setWorkouts] = useState<Workout[]>([]);
-  const [totalXP, setTotalXP] = useState(0);
-  const [unlockedAchievements, setUnlockedAchievements] = useState<string[]>([]);
   const [showAddWorkout, setShowAddWorkout] = useState(false);
-  const [showLoginModal, setShowLoginModal] = useState(false);
-  const[userSess, setUserSess]= useState<Session[]>([]);
+  const [showAuthModal, setShowAuthModal] = useState(false);
   const [activeTab, setActiveTab] = useState('dashboard');
   const [newAchievement, setNewAchievement] = useState<string | null>(null);
 
-  // Load data from localStorage
-  useEffect(() => {
-    getUser();  
-    const saved = localStorage.getItem('workoutData');
-    if (saved) {
-      const data = JSON.parse(saved);
-      setWorkouts(data.workouts || []);
-      setTotalXP(data.totalXP || 0);
-      setUnlockedAchievements(data.unlockedAchievements || []);
-    }
-  }, []);
-
-  // Save data to localStorage
-  useEffect(() => {
-    localStorage.setItem('workoutData', JSON.stringify({
-      workouts,
-      totalXP,
-      unlockedAchievements
-    }));
-  }, [workouts, totalXP, unlockedAchievements]);
+  const { userSess, setUserSess } = useAuth();
 
   const checkAchievements = (newWorkouts: Workout[]) => {
-    const unlocked: string[] = [...unlockedAchievements];
+    const unlocked: string[] = [...(userSess?.unlockedAchievements ?? [])];
     let newUnlocks: string[] = [];
 
     // First workout
@@ -70,6 +43,25 @@ const WorkoutTracker = () => {
       newUnlocks.push('THREE_IN_WEEK');
     }
 
+    // New PR
+    const hasNewPR = newWorkouts.some(w => w.type === 'strength' && w.prAchieved);
+    if (hasNewPR && !unlocked.includes('NEW_PR')) {
+      unlocked.push('NEW_PR');
+      newUnlocks.push('NEW_PR');
+    }
+
+    // 5 PRs in a month
+    const lastMonthPRs = newWorkouts
+      .filter(w => {
+        const diff = Date.now() - new Date(w.date).getTime();
+        return w.type === 'strength' && w.prAchieved && diff < 30 * 24 * 60 * 60 * 1000;
+      });
+
+    if (lastMonthPRs.length >= 5 && !unlocked.includes('PR_MADNESS')) {
+      unlocked.push('PR_MADNESS');
+      newUnlocks.push('PR_MADNESS');
+    }
+
     // 100 total workouts
     if (newWorkouts.length >= 100 && !unlocked.includes('TOTAL_100')) {
       unlocked.push('TOTAL_100');
@@ -84,26 +76,27 @@ const WorkoutTracker = () => {
     }
 
     if (newUnlocks.length > 0) {
-      setUnlockedAchievements(unlocked);
       setNewAchievement(newUnlocks[0]);
       setTimeout(() => setNewAchievement(null), 3000);
     }
+      return unlocked;
   };
 
   const addWorkout = (workout: Workout) => {
     let xpEarned = 50; // Base XP for workout
-    
+    let newPR = false;
+
     if (workout.type === 'strength') {
       xpEarned += workout.exercises.length * 10;
-      
+
       // Check for new PR
       workout.exercises.forEach(ex => {
         const best1RM = ex.sets.reduce((max, set) => {
           const rm = calculate1RM(set.weight, set.reps);
           return rm > max ? rm : max;
         }, 0);
-        
-        const previousBest = workouts
+
+        const previousBest = userSess?.workouts
           .filter(w => w.type === 'strength')
           .flatMap(w => w.exercises)
           .filter(e => e.name === ex.name)
@@ -113,42 +106,56 @@ const WorkoutTracker = () => {
               return r > m ? r : m;
             }, 0);
             return rm > max ? rm : max;
-          }, 0);
+          }, 0) ?? 0;
         
         if (best1RM > previousBest && previousBest > 0) {
           xpEarned += 20;
-          if (!unlockedAchievements.includes('NEW_PR')) {
-            setUnlockedAchievements([...unlockedAchievements, 'NEW_PR']);
-            setNewAchievement('NEW_PR');
-            setTimeout(() => setNewAchievement(null), 3000);
-          }
+          newPR = true;
         }
       });
     } else {
       xpEarned += 30; // Bonus for cardio
     }
 
-    const newWorkouts = [...workouts, { ...workout, id: Date.now(), xpEarned }];
-    setWorkouts(newWorkouts);
-    setTotalXP(totalXP + xpEarned);
-    checkAchievements(newWorkouts);
-    setShowAddWorkout(false);
+    const newWorkouts = [...(userSess?.workouts ?? []), { ...workout, id: Date.now(), xpEarned, prAchieved: newPR }];
+    const unlocked = checkAchievements(newWorkouts);
+
+    // Update session
+    if (userSess) {
+      const mergedAchievements = Array.from(new Set([
+        ...userSess.unlockedAchievements,
+        ...unlocked,
+        ...(newPR ? ['NEW_PR'] : [])
+      ]));
+
+    const updatedSess = {
+      ...userSess,
+      workouts: newWorkouts,
+      totalXP: userSess.totalXP + xpEarned,
+      unlockedAchievements: mergedAchievements
+    };
+
+    setUserSess(updatedSess);
+    localStorage.setItem('session', JSON.stringify(updatedSess));
+    }
   };
 
+  const totalXP = userSess?.totalXP || 0;
   const level = calculateLevel(totalXP);
   const xpForNext = getXPForNextLevel(level);
   const xpProgress = ((totalXP - (level ** 2 * 100)) / (xpForNext - (level ** 2 * 100))) * 100;
 
   // Calculate stats
+  const workouts = userSess?.workouts || [];
   const strengthWorkouts = workouts.filter(w => w.type === 'strength');
   const airbikeWorkouts = workouts.filter(w => w.type === 'airbike');
-  
+
   const currentStreak = (() => {
     if (workouts.length === 0) return 0;
     const sorted = [...workouts].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
     let streak = 0;
     let lastDate = new Date(sorted[0].date);
-    
+
     for (let workout of sorted) {
       const workoutDate = new Date(workout.date);
       const diff = Math.floor((lastDate.getTime() - workoutDate.getTime()) / (1000 * 60 * 60 * 24));
@@ -174,20 +181,12 @@ const WorkoutTracker = () => {
     .filter(w => w.type === 'strength')
     .map(w => ({
       date: new Date(w.date).toLocaleDateString('cs-CZ', { day: '2-digit', month: '2-digit' }),
-      volume: w.exercises.reduce((sum, ex) => 
+      volume: w.exercises.reduce((sum, ex) =>
         sum + ex.sets.reduce((s, set) => s + (set.weight * set.reps), 0), 0
       )
     }));
 
-    function getUser() {
-      const sessionString = localStorage.getItem("session");
-      if (!sessionString) {
-          return null;
-      }
-
-      return setUserSess([JSON.parse(sessionString)]);
-    }
-
+    console.log("User Session:", userSess);
   return (
     <div className="min-h-screen w-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 text-white">
       {/* Achievement Notification */}
@@ -199,42 +198,55 @@ const WorkoutTracker = () => {
 
       {/* Header */}
       <div className="w-full mb-6 p-2">
-        <Header user={userSess} onHeaderBtnClick={() => !userSess[0] ? setShowLoginModal(true) : setShowAddWorkout(true)} />
-        <LevelCard
-          level={level}
-          totalXP={totalXP}
-          xpForNext={xpForNext}
-          xpProgress={xpProgress}
-        />
+        <Header user={userSess} onHeaderBtnClick={() => !userSess ? setShowAuthModal(true) : setShowAddWorkout(true)} />
       </div>
 
-      {/* Navigation */}
-      <div className="w-full mb-6 p-2">
-        <Navigation activeTab={activeTab} onTabChange={setActiveTab} />
-      </div>
+      {userSess ?
+        <>
+          <div className="w-full mb-6 p-2">
+            <LevelCard
+              level={level}
+              totalXP={totalXP}
+              xpForNext={xpForNext}
+              xpProgress={xpProgress}
+            />
+          </div>
 
-      {/* Main Content */}
-      <div className="w-full p-2">
-        {activeTab === 'dashboard' && (
-          <Dashboard
-            strengthWorkouts={strengthWorkouts.length}
-            airbikeWorkouts={airbikeWorkouts.length}
-            currentStreak={currentStreak}
-            volumeData={volumeData}
-          />
-        )}
+          {/* Navigation */}
+          <div className="w-full mb-6 p-2">
+            <Navigation activeTab={activeTab} onTabChange={setActiveTab} />
+          </div>
 
-        {activeTab === 'workouts' && (
-          <WorkoutList workouts={workouts} calculate1RM={calculate1RM} />
-        )}
+          {/* Main Content */}
+          <div className="w-full p-2">
+            {activeTab === 'dashboard' && (
+              <Dashboard
+                strengthWorkouts={strengthWorkouts.length}
+                airbikeWorkouts={airbikeWorkouts.length}
+                currentStreak={currentStreak}
+                volumeData={volumeData}
+              />
+            )}
 
-        {activeTab === 'achievements' && (
-          <AchievementGrid
-            achievements={ACHIEVEMENTS}
-            unlockedAchievements={unlockedAchievements}
-          />
-        )}
-      </div>
+            {activeTab === 'workouts' && (
+              <WorkoutList workouts={workouts} calculate1RM={calculate1RM} />
+            )}
+
+            {activeTab === 'achievements' && (
+              <AchievementGrid
+                achievements={ACHIEVEMENTS}
+                unlockedAchievements={userSess?.unlockedAchievements}
+              />
+            )}
+          </div>
+        </>
+
+        :
+        <div className="bg-white/10 backdrop-blur-lg rounded-xl p-12 text-center">
+          <CircleQuestionMark className="w-16 h-16 mx-auto mb-4 text-gray-400" />
+          <p className="text-gray-400">Login to start your workout journey!</p>
+        </div>
+      }
 
       {/* Add Workout Modal */}
       {showAddWorkout && (
@@ -243,20 +255,9 @@ const WorkoutTracker = () => {
           onAdd={addWorkout}
         />
       )}
-      {showLoginModal && (
-        <LoginModal
-          onClose={() => setShowLoginModal(false)}
-          onLogin={async () => {
-            // Mock login function
-            const mockSession = {
-              id: 1,
-              token: 'mock-token',
-              name: 'John Doe'
-            };
-            localStorage.setItem("session", JSON.stringify(mockSession));
-            setUserSess([mockSession]);
-            setShowLoginModal(false); 
-          }}
+      {showAuthModal && (
+        <AuthModal
+          onClose={() => setShowAuthModal(false)}
         />
       )}
     </div>
