@@ -1,6 +1,6 @@
 export const ACHIEVEMENTS = [
   { id: 'FIRST_WORKOUT', name: 'First Blood', desc: 'First workout', icon: '🥉' },
-  { id: 'THREE_IN_WEEK', name: 'Consistency', desc: '3 workouts in a week', icon: '🥈' },
+  { id: 'THREE_IN_WEEK', name: 'Consistency', desc: '3 workouts in a week', icon: '📅' },
   { id: 'NEW_PR', name: 'Stronger', desc: 'New personal record', icon: '⚡' },
   { id: 'PR_MADNESS', name: 'PR Madness', desc: '5 new PRs in a month', icon: '🏆' },
   { id: 'STREAK_7', name: 'On Fire', desc: '7 days in a row', icon: '🔥' },

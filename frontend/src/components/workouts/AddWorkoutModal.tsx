@@ -243,7 +243,7 @@ export const AddWorkoutModal: React.FC<AddWorkoutModalProps> = ({ onClose, onAdd
                     inputMode="numeric"
                     onInput={(e) => {
                       const input = e.target as HTMLInputElement;
-                      input.value = input.value.replace(/[^0-9]/g, '');
+                      input.value = input.value.replace(/[^0-9.]/g, '');
                     }}
                     value={distance}
                     onChange={(e) => setDistance(e.target.value)}

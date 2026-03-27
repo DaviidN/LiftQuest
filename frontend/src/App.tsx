@@ -83,19 +83,20 @@ const WorkoutTracker = () => {
   };
 
   const addWorkout = (workout: Workout) => {
-    let xpEarned = 50; // Base XP for workout
+    let xpEarned = 0; // Base XP for workout
     let newPR = false;
 
+    // XP calculation based on workout type
     if (workout.type === 'strength') {
-      xpEarned += workout.exercises.length * 10;
+    workout.exercises.forEach(ex => {
 
-      // Check for new PR
-      workout.exercises.forEach(ex => {
+      // Calculate 1RM for each set and find the best one
         const best1RM = ex.sets.reduce((max, set) => {
           const rm = calculate1RM(set.weight, set.reps);
           return rm > max ? rm : max;
         }, 0);
 
+        // Previous best 1RM for this exercise
         const previousBest = userSess?.workouts
           .filter(w => w.type === 'strength')
           .flatMap(w => w.exercises)
@@ -108,13 +109,32 @@ const WorkoutTracker = () => {
             return rm > max ? rm : max;
           }, 0) ?? 0;
         
+        // Bonus XP for new PR
         if (best1RM > previousBest && previousBest > 0) {
           xpEarned += 20;
           newPR = true;
         }
+
+        // Base XP based on intensity for each set
+        ex.sets.forEach(set => {
+          const estimated1RM = calculate1RM(set.weight, set.reps);
+          const intensity = set.weight / estimated1RM;
+
+          let setXP = set.weight * set.reps * (1 + intensity);
+
+          // Bonus for heavy singles/doubles/triples
+          if (set.reps <= 3) {
+            setXP *= 1.3;
+          }
+
+          xpEarned += Math.floor(setXP / 10);
+        });
       });
     } else {
-      xpEarned += 30; // Bonus for cardio
+      // Airbike XP based on calories, time, and intensity
+      const calPerMin = workout.calories / (workout.time / 60);
+      const airBikeXP = workout.calories * 0.5 + calPerMin * 5 + workout.time * 0.2;
+      xpEarned = Math.floor(airBikeXP / 10); // Scale down for balance
     }
 
     const newWorkouts = [...(userSess?.workouts ?? []), { ...workout, id: Date.now(), xpEarned, prAchieved: newPR }];
