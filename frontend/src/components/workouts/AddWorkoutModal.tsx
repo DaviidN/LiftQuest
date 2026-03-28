@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Dumbbell, Activity, X } from 'lucide-react';
 import type { Workout } from '../../types/workout.types';
 import { Button } from '../UI/Button';
@@ -24,6 +24,8 @@ export const AddWorkoutModal: React.FC<AddWorkoutModalProps> = ({ onClose, onAdd
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
   const [errorMessage, setErrorMessage] = useState('');
 
+  const lastExerciseRef = useRef<HTMLDivElement | null>(null);
+
   // Strength workout state
   const [exercises, setExercises] = useState<StrengthExercise[]>([
     { name: 'Squat', sets: [{ weight: '', reps: '' }] }
@@ -36,11 +38,17 @@ export const AddWorkoutModal: React.FC<AddWorkoutModalProps> = ({ onClose, onAdd
 
   const addExercise = () => {
     setExercises([...exercises, { name: 'Squat', sets: [{ weight: '', reps: '' }] }]);
+    setTimeout(() => {
+      lastExerciseRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
+    }, 0);
   };
 
   const removeExercise = () => {
     const newExercises = exercises.filter((_, index) => index !== exercises.length - 1);
     setExercises(newExercises);
+    setTimeout(() => {
+      lastExerciseRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
+    }, 0);
   }
 
   const addSet = (exerciseIndex: number) => {
@@ -87,7 +95,7 @@ export const AddWorkoutModal: React.FC<AddWorkoutModalProps> = ({ onClose, onAdd
       }));
 
       if (validExercises.length === 0) {
-          setErrorMessage('Please fill in all fields!');
+          setErrorMessage('* Please fill in all fields!');
         return;
       }
 
@@ -99,7 +107,7 @@ export const AddWorkoutModal: React.FC<AddWorkoutModalProps> = ({ onClose, onAdd
       onClose();
     } else {
       if (!time || !calories || !distance) {
-        setErrorMessage('Please fill in all fields!');
+        setErrorMessage('* Please fill in all fields!');
         return;
       }
       
@@ -165,9 +173,14 @@ export const AddWorkoutModal: React.FC<AddWorkoutModalProps> = ({ onClose, onAdd
             </div>
 
             {workoutType === 'strength' ? 
-              <div className="space-y-4 max-h-[300px] overflow-y-auto">
-                {exercises.map((exercise, exIndex) => (
-                  <div key={exIndex} className="bg-slate-700 rounded-lg p-4">
+              <>
+              <div className="space-y-4 max-sm:max-h-[300px] max-h-[600px] overflow-y-auto">
+              {exercises.map((exercise, exIndex) => (
+                  <div 
+                    key={exIndex} 
+                    ref={exIndex === exercises.length - 1 ? lastExerciseRef : null}
+                    className="bg-slate-700 rounded-lg p-4" 
+                  >
                     <select
                       value={exercise.name}
                       onChange={(e) => updateExercise(exIndex, 'name', e.target.value as "Squat" | "Bench Press" | "Deadlift")}
@@ -212,17 +225,18 @@ export const AddWorkoutModal: React.FC<AddWorkoutModalProps> = ({ onClose, onAdd
                     </div>
                   </div>
                 ))}
+              </div>
                 <div className="flex gap-2 justify-between">
-                <Button
-                  onClick={addExercise}
-                  variant='tertiary'
-                  className={`transition-all duration-300 ${
-                    exercises.length > 1 ? "w-1/2" : "w-full"
-                  }`}
-                >
-                  <span className="sm:hidden">+ Add</span>
-                  <span className="hidden sm:inline">+ Add exercise</span>
-                </Button>
+                  <Button
+                    onClick={addExercise}
+                    variant='tertiary'
+                    className={`transition-all duration-300 ${
+                      exercises.length > 1 ? "w-1/2" : "w-full"
+                    }`}
+                  >
+                    <span className="sm:hidden">+ Add</span>
+                    <span className="hidden sm:inline">+ Add exercise</span>
+                  </Button>
 
                 {exercises.length > 1 && 
                   <Button
@@ -235,7 +249,7 @@ export const AddWorkoutModal: React.FC<AddWorkoutModalProps> = ({ onClose, onAdd
                   </Button>
                 }
                 </div>
-              </div>
+                </>
              : 
               <div className="space-y-4">
                 <div>
@@ -265,7 +279,7 @@ export const AddWorkoutModal: React.FC<AddWorkoutModalProps> = ({ onClose, onAdd
               </div>
             }
           </div>
-
+            {errorMessage && <p className="text-red-500 mt-4">{errorMessage}</p>}
           <div className="flex gap-3 mt-6">
             <Button
               variant='secondary'
