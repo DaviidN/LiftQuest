@@ -36,7 +36,7 @@ export const Button: React.FC<ButtonProps> = ({
   // Variant styles
   const variantStyles = {
     primary: 'bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white border-none',
-    secondary: 'bg-slate-700 hover:bg-slate-600 text-white',
+    secondary: 'bg-gradient-to-r from-slate-400/40 to-slate-500/40 hover:border-purple-500 text-white',
     tertiary: 'text-purple-400 hover:text-purple-300 border-gray-600 rounded-lg hover:border-purple-500 hover:bg-purple-500/10',
     ghost: 'hover:bg-white/10 text-white',
     outline: 'border-2 border-dashed border-gray-600 hover:border-purple-500 hover:bg-purple-500/10 text-white',
@@ -69,7 +69,7 @@ export const Button: React.FC<ButtonProps> = ({
       type={type}
       onClick={onClick}
       disabled={disabled}
-      className={combinedStyles}
+      className={`text-center ${combinedStyles}`}
     >
       {Icon && <Icon className="w-5 h-5" />}
       {children}

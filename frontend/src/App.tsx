@@ -206,20 +206,17 @@ const WorkoutTracker = () => {
       )
     }));
 
-    console.log("User Session:", userSess);
   return (
-    <div className="min-h-screen w-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 text-white">
+      <div className="min-h-screen w-screen max-sm:w-full mx-auto px-4 bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
       {/* Achievement Notification */}
       {newAchievement && (
         <AchievementNotification
-          achievementName={ACHIEVEMENTS.find(a => a.id === newAchievement)?.name || ''}
+        achievementName={ACHIEVEMENTS.find(a => a.id === newAchievement)?.name || ''}
         />
       )}
 
       {/* Header */}
-      <div className="w-full mb-6 p-2">
-        <Header user={userSess} onHeaderBtnClick={() => !userSess ? setShowAuthModal(true) : setShowAddWorkout(true)} />
-      </div>
+      <Header user={userSess} onHeaderBtnClick={() => !userSess ? setShowAuthModal(true) : setShowAddWorkout(true)} />
 
       {userSess ?
         <>
@@ -229,7 +226,7 @@ const WorkoutTracker = () => {
               totalXP={totalXP}
               xpForNext={xpForNext}
               xpProgress={xpProgress}
-            />
+              />
           </div>
 
           {/* Navigation */}
@@ -241,10 +238,10 @@ const WorkoutTracker = () => {
           <div className="w-full p-2">
             {activeTab === 'dashboard' && (
               <Dashboard
-                strengthWorkouts={strengthWorkouts.length}
-                airbikeWorkouts={airbikeWorkouts.length}
-                currentStreak={currentStreak}
-                volumeData={volumeData}
+              strengthWorkouts={strengthWorkouts.length}
+              airbikeWorkouts={airbikeWorkouts.length}
+              currentStreak={currentStreak}
+              volumeData={volumeData}
               />
             )}
 
@@ -254,8 +251,8 @@ const WorkoutTracker = () => {
 
             {activeTab === 'achievements' && (
               <AchievementGrid
-                achievements={ACHIEVEMENTS}
-                unlockedAchievements={userSess?.unlockedAchievements}
+              achievements={ACHIEVEMENTS}
+              unlockedAchievements={userSess?.unlockedAchievements}
               />
             )}
           </div>
@@ -271,8 +268,8 @@ const WorkoutTracker = () => {
       {/* Add Workout Modal */}
       {showAddWorkout && (
         <AddWorkoutModal
-          onClose={() => setShowAddWorkout(false)}
-          onAdd={addWorkout}
+        onClose={() => setShowAddWorkout(false)}
+        onAdd={addWorkout}
         />
       )}
       {showAuthModal && (
