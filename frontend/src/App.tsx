@@ -207,7 +207,7 @@ const WorkoutTracker = () => {
     }));
 
   return (
-      <div className="min-h-screen w-screen max-sm:w-full mx-auto px-4 bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+      <div className="min-h-screen w-screen max-sm:w-full mx-auto px-4 bg-gradient-to-br from-primary-from via-purple-900 to-slate-900">
       {/* Achievement Notification */}
       {newAchievement && (
         <AchievementNotification

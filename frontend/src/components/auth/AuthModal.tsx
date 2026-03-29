@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { X, Mail, Lock, User } from "lucide-react";
 import { Button } from "../UI/Button";
 import { useAuth } from "../../context/userSessContext";
+import { Input } from "../UI/Input";
 
 interface AuthModalProps {
   onClose: () => void;
@@ -18,19 +19,21 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [username, setUsername] = useState("");
-  const [touched, setTouched] = useState({
-    email: false,
-    password: false,
-    username: false,
-  });
+  const [touched, setTouched] = useState({ email: false, password: false, username: false });
 
   const { setUserSess } = useAuth();
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setTouched({ email: true, password: true, username: true });
-    
-    if (!email || !password) return;
-    if (mode === 'signup' && !username) return;
+
+    setTouched({
+      email: true,
+      password: true,
+      username: true,
+    });
+
+    if (!email || !password || (mode === 'signup' && !username)) {
+      return;
+    }
 
     if (mode === 'login') {
       // Mock login function
@@ -63,47 +66,41 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
   const switchMode = () => {
     setMode(mode === 'login' ? 'signup' : 'login');
-    setTouched({ email: false, password: false, username: false });
+    setTouched({ email: false, password: false, username: false }); // Reset touched on mode switch
   };
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-      <div className="bg-slate-800 rounded-2xl max-w-md w-full shadow-2xl border border-slate-700">
+      <div className="bg-secondary rounded-2xl max-w-md w-full shadow-2xl border border-slate-700">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-slate-700">
-          <h2 className="text-2xl font-bold bg-gradient-to-r from-purple-400 to-pink-600 bg-clip-text text-transparent">
-            {mode === 'login' ? 'Přihlášení' : 'Registrace'}
+          <h2 className="text-2xl font-bold">
+            {mode === 'login' ? 'Login' : 'Sign Up'}
           </h2>
-          <button
+          <Button
             onClick={onClose}
-            className="text-gray-400 hover:text-white transition-colors"
+            variant="tertiary"
           >
             <X className="w-6 h-6" />
-          </button>
+          </Button>
         </div>
 
         {/* Tab Navigation */}
         <div className="flex gap-2 p-4 bg-slate-900/50">
-          <button
+          <Button 
             onClick={() => setMode('login')}
-            className={`flex-1 py-2 px-4 rounded-lg font-medium transition-all ${
-              mode === 'login'
-                ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white'
-                : 'text-gray-400 hover:text-white hover:bg-slate-700'
-            }`}
+            variant={mode === 'login' ? 'primary' : 'ghost'}
+            className="flex-1"
           >
             Login
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={() => setMode('signup')}
-            className={`flex-1 py-2 px-4 rounded-lg font-medium transition-all ${
-              mode === 'signup'
-                ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white'
-                : 'text-gray-400 hover:text-white hover:bg-slate-700'
-            }`}
+            variant={mode === 'signup' ? 'primary' : 'ghost'}
+            className="flex-1"
           >
             Sign Up
-          </button>
+          </Button>
         </div>
 
         {/* Form */}
@@ -115,13 +112,13 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               </label>
               <div className="relative">
                 <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                <input
+                <Input
                   type="text"
+                  signup
                   placeholder="johndoe"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
-                  onBlur={() => setTouched({ ...touched, username: true })}
-                  className={`w-full bg-slate-700 rounded-lg pl-11 pr-4 py-3 focus:outline-none focus:ring-2 transition-all ${
+                  className={`pl-11 ${
                     touched.username && !username
                       ? 'ring-2 ring-red-500 focus:ring-red-500'
                       : 'focus:ring-purple-500'
@@ -140,13 +137,12 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             </label>
             <div className="relative">
               <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-              <input
+              <Input
                 type="email"
                 placeholder="your@email.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                onBlur={() => setTouched({ ...touched, email: true })}
-                className={`w-full bg-slate-700 rounded-lg pl-11 pr-4 py-3 focus:outline-none focus:ring-2 transition-all ${
+                className={`pl-11 ${
                   touched.email && !email
                     ? 'ring-2 ring-red-500 focus:ring-red-500'
                     : 'focus:ring-purple-500'
@@ -164,13 +160,12 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             </label>
             <div className="relative">
               <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-              <input
+              <Input
                 type="password"
                 placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                onBlur={() => setTouched({ ...touched, password: true })}
-                className={`w-full bg-slate-700 rounded-lg pl-11 pr-4 py-3 focus:outline-none focus:ring-2 transition-all ${
+                className={`pl-11 ${
                   touched.password && !password
                     ? 'ring-2 ring-red-500 focus:ring-red-500'
                     : 'focus:ring-purple-500'
@@ -190,9 +185,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
           <Button
             type="submit"
-            variant="primary"
+            variant='primary'
             fullWidth
-            disabled={loading || !email || !password || (mode === 'signup' && !username)}
             className="mt-6"
           >
             {loading ? (
@@ -210,14 +204,15 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
         {/* Footer */}
         <div className="p-6 pt-0 text-center">
-          <p className="text-gray-400 text-sm">
+          <p className="text-gray-400 text-sm flex px-4 justify-center items-center gap-2">
             {mode === 'login' ? "Don't have an account?" : 'Already have an account?'}{' '}
-            <button
+            <Button
+              variant="tertiary"
               onClick={switchMode}
-              className="text-purple-400 hover:text-purple-300 font-medium transition-colors"
+              size="sm"
             >
               {mode === 'login' ? 'Sign up' : 'Log In'}
-            </button>
+            </Button>
           </p>
         </div>
       </div>

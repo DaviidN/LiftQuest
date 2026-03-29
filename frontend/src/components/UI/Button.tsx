@@ -1,7 +1,7 @@
 import React from 'react';
 import type { LucideIcon } from 'lucide-react';
 
-type ButtonVariant = 'primary' | 'secondary' | 'tertiary' | 'ghost' | 'outline';
+type ButtonVariant = 'primary' | 'secondary' | 'tertiary' | 'ghost';
 type ButtonSize = 'sm' | 'md' | 'lg';
 
 interface ButtonProps {
@@ -27,19 +27,16 @@ export const Button: React.FC<ButtonProps> = ({
   type = 'button',
   fullWidth = false,
 }) => {
-  // Check if custom colors are provided
-  const hasCustomColors = className.includes('bg-') || className.includes('text-');
 
   // Base styles
   const baseStyles = 'rounded-lg font-medium transition-all flex items-center justify-center gap-2';
 
   // Variant styles
   const variantStyles = {
-    primary: 'bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white border-none',
-    secondary: 'bg-gradient-to-r from-slate-400/40 to-slate-500/40 hover:border-purple-500 text-white',
-    tertiary: 'text-purple-400 hover:text-purple-300 border-gray-600 rounded-lg hover:border-purple-500 hover:bg-purple-500/10',
-    ghost: 'hover:bg-white/10 text-white',
-    outline: 'border-2 border-dashed border-gray-600 hover:border-purple-500 hover:bg-purple-500/10 text-white',
+    primary: 'bg-gradient-to-r from-btnPrimary-from to-btnPrimary-to hover:from-btnPrimaryHover-from hover:to-btnPrimaryHover-to text-white border-none',
+    secondary: 'bg-btnSecondary hover:bg-btnSecondaryHover border-purple-500/30 hover:border-purple-500/50 text-purple-200',
+    tertiary: 'bg-btnTertiary hover:bg-btnTertiaryHover border-slate-500 hover:border-slate-400',
+    ghost: 'border-none',
   };
 
   // Size styles
@@ -57,7 +54,7 @@ export const Button: React.FC<ButtonProps> = ({
 
   const combinedStyles = `
     ${baseStyles}
-    ${hasCustomColors ? '' : variantStyles[variant] }
+    ${variantStyles[variant]}
     ${sizeStyles[size]}
     ${disabledStyles}
     ${widthStyles}

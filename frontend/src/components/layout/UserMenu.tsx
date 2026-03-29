@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { LogOut, User, Settings, Trophy } from 'lucide-react';
+import { LogOut } from 'lucide-react';
 
 interface UserMenuProps {
   username: string;
@@ -50,49 +50,12 @@ export const UserMenu: React.FC<UserMenuProps> = ({ username, onLogout }) => {
 
       {/* Dropdown Menu */}
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-56 bg-slate-800 border border-slate-700 rounded-lg shadow-xl overflow-hidden z-50">
+        <div className="absolute right-0 mt-2 w-56 bg-secondary border border-slate-700 rounded-lg shadow-xl overflow-hidden z-50">
           {/* User Info */}
           <div className="px-4 py-3 border-b border-slate-700">
             <p className="text-sm font-medium">{username}</p>
             <p className="text-xs text-gray-400 mt-1">Manage your account</p>
           </div>
-
-          {/* Menu Items */}
-          <div className="py-2">
-            <button
-              onClick={() => {
-                setIsOpen(false);
-                // TODO: Navigate to profile
-              }}
-              className="w-full flex items-center gap-3 px-4 py-2 text-left hover:bg-slate-700 transition-colors"
-            >
-              <User className="w-4 h-4 text-gray-400" />
-              <span className="text-sm">Profile</span>
-            </button>
-
-            <button
-              onClick={() => {
-                setIsOpen(false);
-                // TODO: Navigate to stats
-              }}
-              className="w-full flex items-center gap-3 px-4 py-2 text-left hover:bg-slate-700 transition-colors"
-            >
-              <Trophy className="w-4 h-4 text-gray-400" />
-              <span className="text-sm">Stats</span>
-            </button>
-
-            <button
-              onClick={() => {
-                setIsOpen(false);
-                // TODO: Navigate to settings
-              }}
-              className="w-full flex items-center gap-3 px-4 py-2 text-left hover:bg-slate-700 transition-colors"
-            >
-              <Settings className="w-4 h-4 text-gray-400" />
-              <span className="text-sm">Settings</span>
-            </button>
-          </div>
-
           {/* Logout */}
           <div className="border-t border-slate-700">
             <button

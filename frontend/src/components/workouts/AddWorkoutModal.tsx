@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Dumbbell, Activity, X } from 'lucide-react';
 import type { Workout } from '../../types/workout.types';
 import { Button } from '../UI/Button';
@@ -23,6 +23,8 @@ export const AddWorkoutModal: React.FC<AddWorkoutModalProps> = ({ onClose, onAdd
   const [workoutType, setWorkoutType] = useState<'strength' | 'airbike'>('strength');
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
   const [errorMessage, setErrorMessage] = useState('');
+  const [validExercises, setValidExercises] = useState<StrengthExercise[]>([]);
+  const [validWorkout, setValidWorkout] = useState(false);
 
   const lastExerciseRef = useRef<HTMLDivElement | null>(null);
 
@@ -35,6 +37,20 @@ export const AddWorkoutModal: React.FC<AddWorkoutModalProps> = ({ onClose, onAdd
   const [time, setTime] = useState('');
   const [calories, setCalories] = useState('');
   const [distance, setDistance] = useState('');
+
+
+  useEffect(() => {
+    if (workoutType === 'strength') {
+      const filtered = exercises.filter(ex =>
+        ex.name && ex.sets.some(s => s.weight && s.reps)
+      );
+      setValidExercises(filtered);
+      setValidWorkout(filtered.length > 0);
+    } else {
+      setValidWorkout(time !== '' && calories !== '' && distance !== '');
+      setValidExercises([]); // Clear when not in strength mode
+    }
+  }, [workoutType, exercises, time, calories, distance]);
 
   const addExercise = () => {
     setExercises([...exercises, { name: 'Squat', sets: [{ weight: '', reps: '' }] }]);
@@ -84,29 +100,29 @@ export const AddWorkoutModal: React.FC<AddWorkoutModalProps> = ({ onClose, onAdd
 
   const handleSubmit = () => {
     if (workoutType === 'strength') {
-      const validExercises = exercises.filter(ex => 
-        ex.name && ex.sets.some(s => s.weight && s.reps)
-      ).map(ex => ({
-        ...ex,
-        sets: ex.sets.filter(s => s.weight && s.reps).map(s => ({
-          weight: parseFloat(s.weight),
-          reps: parseInt(s.reps)
-        }))
-      }));
-
-      if (validExercises.length === 0) {
+      if (!validWorkout) {
           setErrorMessage('* Please fill in all fields!');
         return;
       }
+      const mappedExercises = validExercises.map(ex => ({
+      ...ex,
+      sets: ex.sets
+        .filter(s => s.weight && s.reps)
+        .map(s => ({
+          weight: parseFloat(s.weight),
+          reps: parseInt(s.reps)
+        }))
+    }));
+
 
       onAdd({
         type: 'strength',
         date,
-        exercises: validExercises
+        exercises: mappedExercises
       });
       onClose();
     } else {
-      if (!time || !calories || !distance) {
+      if (!validWorkout) {
         setErrorMessage('* Please fill in all fields!');
         return;
       }
@@ -124,7 +140,7 @@ export const AddWorkoutModal: React.FC<AddWorkoutModalProps> = ({ onClose, onAdd
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-      <div className="bg-slate-800 rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6">
+      <div className="bg-secondary rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-2xl font-bold">New workout</h2>
             <Button onClick={onClose} variant='secondary'>
@@ -146,25 +162,19 @@ export const AddWorkoutModal: React.FC<AddWorkoutModalProps> = ({ onClose, onAdd
               <label className="block text-sm font-medium mb-2">Workout type</label>
               <div className="flex gap-2">
                 <Button
+                  variant={workoutType === 'strength' ? 'primary' : 'secondary'}
                   onClick={() => setWorkoutType('strength')}
                   size='lg'
-                  className={`flex-1 py-2 rounded-lg transition-all ${
-                    workoutType === 'strength'
-                      ? 'bg-purple-500'
-                      : 'bg-slate-700 hover:bg-slate-600'
-                  } `}
+                  className={'flex-1 py-2 rounded-lg transition-all'}
                 >
                   <Dumbbell/>
                   Strength
                 </Button>
                 <Button
+                  variant={workoutType === 'airbike' ? 'primary' : 'secondary'}
                   onClick={() => setWorkoutType('airbike')}
                   size='lg'
-                  className={`flex-1 py-2 rounded-lg transition-all  ${
-                    workoutType === 'airbike'
-                      ? 'bg-pink-500'
-                      : 'bg-slate-700 hover:bg-slate-600'
-                  } `}
+                  className={'flex-1 py-2 rounded-lg transition-all'}
                 >
                   <Activity/>
                   Airbike
@@ -285,12 +295,16 @@ export const AddWorkoutModal: React.FC<AddWorkoutModalProps> = ({ onClose, onAdd
               variant='secondary'
               onClick={onClose}
               className="flex-1"
+              size='lg'
             >
               Cancel
             </Button>
             <Button
               onClick={handleSubmit}
               className="flex-1"
+              size='lg'
+              variant='primary'
+              disabled={!validWorkout}
             >
               Save
             </Button>

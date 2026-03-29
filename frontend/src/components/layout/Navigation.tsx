@@ -17,13 +17,10 @@ export const Navigation: React.FC<NavigationProps> = ({ activeTab, onTabChange }
     <div className="flex gap-2 bg-white/10 backdrop-blur-lg rounded-lg p-2">
       {tabs.map(tab => (
         <Button
+          variant={activeTab === tab.id ? 'primary' : 'ghost'}
           key={tab.id}
           onClick={() => onTabChange(tab.id)}
-          className={`flex-1 py-2 px-4 rounded-lg transition-all border-none ${
-            activeTab === tab.id
-              ? 'bg-gradient-to-r from-purple-500 to-pink-500'
-              : 'bg-black hover:bg-white/10'
-          }`}
+          className={'flex-1 py-2 px-4 rounded-lg transition-all'}
         >
           {tab.label}
         </Button>

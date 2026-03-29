@@ -31,7 +31,7 @@ export const LevelCard: React.FC<LevelCardProps> = ({
       </div>
       <div className="w-full bg-gray-700 rounded-full h-3">
         <div
-          className="bg-gradient-to-r from-purple-500 to-pink-500 h-3 rounded-full transition-all duration-500"
+          className="bg-gradient-to-r from-purple-600 to-pink-600 h-3 rounded-full transition-all duration-500"
           style={{ width: `${xpProgress}%` }}
         />
       </div>
