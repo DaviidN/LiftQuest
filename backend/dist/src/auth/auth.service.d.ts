@@ -1,5 +1,5 @@
 import { JwtService } from '@nestjs/jwt';
-import { PrismaService } from '../prisma/prisma.service';
+import { PrismaService } from 'prisma/prisma.service';
 import { SignupDto } from './dto/signup.dto';
 import { LoginDto } from './dto/login.dto';
 export declare class AuthService {
@@ -9,20 +9,25 @@ export declare class AuthService {
     signup(dto: SignupDto): Promise<{
         token: string;
         user: {
-            id: any;
-            email: any;
-            username: any;
-            totalXP: any;
+            id: string;
+            email: string;
+            username: string;
+            totalXP: number;
         };
     }>;
     login(dto: LoginDto): Promise<{
         token: string;
         user: {
-            id: any;
-            email: any;
-            username: any;
-            totalXP: any;
+            id: string;
+            email: string;
+            username: string;
+            totalXP: number;
         };
     }>;
-    validateUser(userId: string): Promise<any>;
+    validateUser(userId: string): Promise<{
+        email: string;
+        username: string;
+        id: string;
+        totalXP: number;
+    } | null>;
 }

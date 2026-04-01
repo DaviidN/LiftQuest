@@ -1,13 +1,34 @@
 import { OnModuleInit } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
+import { PrismaService } from 'prisma/prisma.service';
 import { UsersService } from '../users/users.service';
 export declare class AchievementsService implements OnModuleInit {
     private prisma;
     private usersService;
     constructor(prisma: PrismaService, usersService: UsersService);
     onModuleInit(): Promise<void>;
-    findAll(): Promise<any>;
-    getUserAchievements(userId: string): Promise<any>;
+    findAll(): Promise<{
+        id: string;
+        name: string;
+        code: string;
+        description: string;
+        icon: string;
+        xp: number;
+    }[]>;
+    getUserAchievements(userId: string): Promise<({
+        achievement: {
+            id: string;
+            name: string;
+            code: string;
+            description: string;
+            icon: string;
+            xp: number;
+        };
+    } & {
+        id: string;
+        userId: string;
+        achievementId: string;
+        unlockedAt: Date;
+    })[]>;
     checkAndUnlock(userId: string): Promise<string[]>;
     private unlockAchievement;
 }

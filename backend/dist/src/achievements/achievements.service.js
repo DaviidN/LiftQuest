@@ -8,11 +8,10 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-var _a;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AchievementsService = void 0;
 const common_1 = require("@nestjs/common");
-const prisma_service_1 = require("../prisma/prisma.service");
+const prisma_service_1 = require("../../prisma/prisma.service");
 const users_service_1 = require("../users/users.service");
 const ACHIEVEMENTS = [
     { code: 'FIRST_WORKOUT', name: 'First Blood', description: 'Complete your first workout', icon: '🥉', xp: 50 },
@@ -122,6 +121,7 @@ let AchievementsService = class AchievementsService {
 exports.AchievementsService = AchievementsService;
 exports.AchievementsService = AchievementsService = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [typeof (_a = typeof prisma_service_1.PrismaService !== "undefined" && prisma_service_1.PrismaService) === "function" ? _a : Object, users_service_1.UsersService])
+    __metadata("design:paramtypes", [prisma_service_1.PrismaService,
+        users_service_1.UsersService])
 ], AchievementsService);
 //# sourceMappingURL=achievements.service.js.map

@@ -7,19 +7,19 @@ export declare class AuthController {
     signup(dto: SignupDto): Promise<{
         token: string;
         user: {
-            id: any;
-            email: any;
-            username: any;
-            totalXP: any;
+            id: string;
+            email: string;
+            username: string;
+            totalXP: number;
         };
     }>;
     login(dto: LoginDto): Promise<{
         token: string;
         user: {
-            id: any;
-            email: any;
-            username: any;
-            totalXP: any;
+            id: string;
+            email: string;
+            username: string;
+            totalXP: number;
         };
     }>;
 }

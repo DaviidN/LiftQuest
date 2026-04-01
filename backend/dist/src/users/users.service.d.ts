@@ -1,13 +1,31 @@
-import { PrismaService } from '../prisma/prisma.service';
+import { PrismaService } from 'prisma/prisma.service';
 export declare class UsersService {
     private prisma;
     constructor(prisma: PrismaService);
-    getProfile(userId: string): Promise<any>;
-    updateXP(userId: string, xpToAdd: number): Promise<any>;
+    getProfile(userId: string): Promise<{
+        email: string;
+        username: string;
+        id: string;
+        totalXP: number;
+        createdAt: Date;
+        _count: {
+            workouts: number;
+            unlockedAchievements: number;
+        };
+    } | null>;
+    updateXP(userId: string, xpToAdd: number): Promise<{
+        email: string;
+        username: string;
+        password: string;
+        id: string;
+        totalXP: number;
+        createdAt: Date;
+        updatedAt: Date;
+    }>;
     getStats(userId: string): Promise<{
-        totalWorkouts: any;
-        strengthWorkouts: any;
-        airbikeWorkouts: any;
+        totalWorkouts: number;
+        strengthWorkouts: number;
+        airbikeWorkouts: number;
         currentStreak: number;
     }>;
 }
