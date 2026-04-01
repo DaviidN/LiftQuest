@@ -1,0 +1,94 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  username  String   @unique
+  password  String
+  totalXP   Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  workouts              Workout[]
+  unlockedAchievements  UserAchievement[]
+
+  @@map("users")
+}
+
+model Workout {
+  id        String   @id @default(uuid())
+  userId    String
+  date      DateTime
+  type      String   // 'strength' or 'airbike'
+  xpEarned  Int      @default(0)
+  createdAt DateTime @default(now())
+
+  // For airbike workouts
+  time      Int?
+  calories  Int?
+  distance  Float?
+
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  exercises Exercise[]
+
+  @@map("workouts")
+}
+
+model Exercise {
+  id        String @id @default(uuid())
+  workoutId String
+  name      String
+
+  workout   Workout @relation(fields: [workoutId], references: [id], onDelete: Cascade)
+  sets      Set[]
+
+  @@map("exercises")
+}
+
+model Set {
+  id         String @id @default(uuid())
+  exerciseId String
+  weight     Float
+  reps       Int
+
+  exercise   Exercise @relation(fields: [exerciseId], references: [id], onDelete: Cascade)
+
+  @@map("sets")
+}
+
+model Achievement {
+  id          String @id @default(uuid())
+  code        String @unique
+  name        String
+  description String
+  icon        String
+  xp          Int
+
+  users UserAchievement[]
+
+  @@map("achievements")
+}
+
+model UserAchievement {
+  id            String   @id @default(uuid())
+  userId        String
+  achievementId String
+  unlockedAt    DateTime @default(now())
+
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  achievement Achievement @relation(fields: [achievementId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, achievementId])
+  @@map("user_achievements")
+}
