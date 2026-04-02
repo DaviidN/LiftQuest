@@ -52,6 +52,9 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
   const switchMode = () => {
     setMode(mode === 'login' ? 'signup' : 'login');
+    setEmail('');
+    setPassword('');
+    setUsername('');
     setTouched({ email: false, password: false, username: false }); // Reset touched on mode switch
   };
 
@@ -74,14 +77,14 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         {/* Tab Navigation */}
         <div className="flex gap-2 p-4 bg-slate-900/50">
           <Button 
-            onClick={() => setMode('login')}
+            onClick={() => switchMode()}
             variant={mode === 'login' ? 'primary' : 'ghost'}
             className="flex-1"
           >
             Login
           </Button>
           <Button
-            onClick={() => setMode('signup')}
+            onClick={() => switchMode()}
             variant={mode === 'signup' ? 'primary' : 'ghost'}
             className="flex-1"
           >
