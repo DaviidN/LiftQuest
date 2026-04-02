@@ -1,8 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useAuth } from './context/userSessContext';
 import type { Workout } from './types/workout.types';
-import { calculate1RM, calculateLevel, getXPForNextLevel } from './utils/calculations';
-import { ACHIEVEMENTS } from './constants/achievements';
+import { calculateLevel, getXPForNextLevel } from './utils/calculations';
+import { api } from './services/api';
 import { CircleQuestionMark } from 'lucide-react';
+import { ACHIEVEMENTS } from './constants/achievements';
+import { calculate1RM } from './utils/calculations';
 
 import { Header } from './components/layout/Header';
 import { LevelCard } from './components/layout/LevelCard';
@@ -13,159 +16,63 @@ import { AddWorkoutModal } from './components/workouts/AddWorkoutModal';
 import { AchievementGrid } from './components/achievements/AchievementGrid';
 import { AchievementNotification } from './components/common/AchievementNotification';
 import { AuthModal } from './components/auth/AuthModal';
-import { useAuth } from './context/userSessContext';
+
+import { useAuthActions } from './hooks/userAuthActions';
 
 const WorkoutTracker = () => {
+  const [achievements, setAchievements] = useState<any[]>([]);
   const [showAddWorkout, setShowAddWorkout] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [activeTab, setActiveTab] = useState('dashboard');
   const [newAchievement, setNewAchievement] = useState<string | null>(null);
 
-  const { userSess, setUserSess } = useAuth();
-
-  const checkAchievements = (newWorkouts: Workout[]) => {
-    const unlocked: string[] = [...(userSess?.unlockedAchievements ?? [])];
-    let newUnlocks: string[] = [];
-
-    // First workout
-    if (newWorkouts.length === 1 && !unlocked.includes('FIRST_WORKOUT')) {
-      unlocked.push('FIRST_WORKOUT');
-      newUnlocks.push('FIRST_WORKOUT');
-    }
-
-    // 3 workouts in a week
-    const lastWeek = newWorkouts.filter(w => {
-      const diff = Date.now() - new Date(w.date).getTime();
-      return diff < 7 * 24 * 60 * 60 * 1000;
-    });
-    if (lastWeek.length >= 3 && !unlocked.includes('THREE_IN_WEEK')) {
-      unlocked.push('THREE_IN_WEEK');
-      newUnlocks.push('THREE_IN_WEEK');
-    }
-
-    // New PR
-    const hasNewPR = newWorkouts.some(w => w.type === 'strength' && w.prAchieved);
-    if (hasNewPR && !unlocked.includes('NEW_PR')) {
-      unlocked.push('NEW_PR');
-      newUnlocks.push('NEW_PR');
-    }
-
-    // 5 PRs in a month
-    const lastMonthPRs = newWorkouts
-      .filter(w => {
-        const diff = Date.now() - new Date(w.date).getTime();
-        return w.type === 'strength' && w.prAchieved && diff < 30 * 24 * 60 * 60 * 1000;
-      });
-
-    if (lastMonthPRs.length >= 5 && !unlocked.includes('PR_MADNESS')) {
-      unlocked.push('PR_MADNESS');
-      newUnlocks.push('PR_MADNESS');
-    }
-
-    // 100 total workouts
-    if (newWorkouts.length >= 100 && !unlocked.includes('TOTAL_100')) {
-      unlocked.push('TOTAL_100');
-      newUnlocks.push('TOTAL_100');
-    }
-
-    // 10 airbike workouts
-    const airbikeCount = newWorkouts.filter(w => w.type === 'airbike').length;
-    if (airbikeCount >= 10 && !unlocked.includes('AIRBIKE_BEAST')) {
-      unlocked.push('AIRBIKE_BEAST');
-      newUnlocks.push('AIRBIKE_BEAST');
-    }
-
-    if (newUnlocks.length > 0) {
-      setNewAchievement(newUnlocks[0]);
-      setTimeout(() => setNewAchievement(null), 3000);
-    }
-      return unlocked;
-  };
-
-  const addWorkout = (workout: Workout) => {
-    let xpEarned = 0; // Base XP for workout
-    let newPR = false;
-
-    // XP calculation based on workout type
-    if (workout.type === 'strength') {
-    workout.exercises.forEach(ex => {
-
-      // Calculate 1RM for each set and find the best one
-        const best1RM = ex.sets.reduce((max, set) => {
-          const rm = calculate1RM(set.weight, set.reps);
-          return rm > max ? rm : max;
-        }, 0);
-
-        // Previous best 1RM for this exercise
-        const previousBest = userSess?.workouts
-          .filter(w => w.type === 'strength')
-          .flatMap(w => w.exercises)
-          .filter(e => e.name === ex.name)
-          .reduce((max, e) => {
-            const rm = e.sets.reduce((m, s) => {
-              const r = calculate1RM(s.weight, s.reps);
-              return r > m ? r : m;
-            }, 0);
-            return rm > max ? rm : max;
-          }, 0) ?? 0;
-        
-        // Bonus XP for new PR
-        if (best1RM > previousBest && previousBest > 0) {
-          xpEarned += 20;
-          newPR = true;
-        }
-
-        // Base XP based on intensity for each set
-        ex.sets.forEach(set => {
-          const estimated1RM = calculate1RM(set.weight, set.reps);
-          const intensity = set.weight / estimated1RM;
-
-          let setXP = set.weight * set.reps * (1 + intensity);
-
-          // Bonus for heavy singles/doubles/triples
-          if (set.reps <= 3) {
-            setXP *= 1.3;
-          }
-
-          xpEarned += Math.floor(setXP / 10);
-        });
-      });
-    } else {
-      // Airbike XP based on calories, time, and intensity
-      const calPerMin = workout.calories / (workout.time / 60);
-      const airBikeXP = workout.calories * 0.5 + calPerMin * 5 + workout.time * 0.2;
-      xpEarned = Math.floor(airBikeXP / 10); // Scale down for balance
-    }
-
-    const newWorkouts = [...(userSess?.workouts ?? []), { ...workout, id: Date.now(), xpEarned, prAchieved: newPR }];
-    const unlocked = checkAchievements(newWorkouts);
-
-    // Update session
-    if (userSess) {
-      const mergedAchievements = Array.from(new Set([
-        ...userSess.unlockedAchievements,
-        ...unlocked,
-        ...(newPR ? ['NEW_PR'] : [])
-      ]));
-
-    const updatedSess = {
-      ...userSess,
-      workouts: newWorkouts,
-      totalXP: userSess.totalXP + xpEarned,
-      unlockedAchievements: mergedAchievements
+  const { userSess, isLoading } = useAuth();
+  const { logout, addWorkout } = useAuthActions();
+  
+  // Load achievements on mount and after adding a workout
+  useEffect(() => {
+    const fetchAchievements = async () => {
+      try {
+        const data = await api.getAchievements();
+        setAchievements(data);
+      } catch (error) {
+        console.error('Failed to load achievements:', error);
+      }
     };
+    fetchAchievements();
+  }, []);
 
-    setUserSess(updatedSess);
-    localStorage.setItem('session', JSON.stringify(updatedSess));
+ const handleAddWorkout = async (workout: Workout) => {
+    try {
+      const result = await addWorkout(workout);
+
+      // Check for new achievements
+      if (result.unlockedAchievements.length > 0) {
+        setNewAchievement(result.unlockedAchievements[0]);
+        setTimeout(() => setNewAchievement(null), 3000);
+      }
+
+      setShowAddWorkout(false);
+    } catch (error) {
+      console.error('Failed to add workout:', error);
     }
   };
 
+  // Loading state
+  if (isLoading) {
+    return (
+      <div className="min-h-screen w-screen bg-gradient-to-br from-primary-from via-primary-via to-primary-to flex items-center justify-center text-white">
+        <div className="text-xl">Loading...</div>
+      </div>
+    );
+  }
+
+  // Calculate stats
   const totalXP = userSess?.totalXP || 0;
   const level = calculateLevel(totalXP);
   const xpForNext = getXPForNextLevel(level);
   const xpProgress = ((totalXP - (level ** 2 * 100)) / (xpForNext - (level ** 2 * 100))) * 100;
 
-  // Calculate stats
   const workouts = userSess?.workouts || [];
   const strengthWorkouts = workouts.filter(w => w.type === 'strength');
   const airbikeWorkouts = workouts.filter(w => w.type === 'airbike');
@@ -189,7 +96,6 @@ const WorkoutTracker = () => {
     return streak;
   })();
 
-  // Prepare chart data
   const last30Days = workouts
     .filter(w => {
       const diff = Date.now() - new Date(w.date).getTime();
@@ -207,16 +113,22 @@ const WorkoutTracker = () => {
     }));
 
   return (
-      <div className="min-h-screen w-screen max-sm:w-full mx-auto px-4 bg-gradient-to-br from-primary-from via-purple-900 to-slate-900">
+    <div className="min-h-screen w-screen max-sm:w-full mx-auto px-4 bg-gradient-to-br from-primary-from via-primary-via to-primary-to">
       {/* Achievement Notification */}
       {newAchievement && (
         <AchievementNotification
-        achievementName={ACHIEVEMENTS.find(a => a.id === newAchievement)?.name || ''}
+          achievementName={achievements.find(a => a.code === newAchievement)?.name || ''}
         />
       )}
 
       {/* Header */}
-      <Header user={userSess} onHeaderBtnClick={() => !userSess ? setShowAuthModal(true) : setShowAddWorkout(true)} />
+      <div className="w-full mb-6 p-2">
+        <Header 
+          onHeaderBtnClick={userSess ? () => setShowAddWorkout(true) : () => setShowAuthModal(true)}
+          logOut={logout} 
+          user={userSess}        
+        />
+      </div>
 
       {userSess ?
         <>
@@ -268,8 +180,8 @@ const WorkoutTracker = () => {
       {/* Add Workout Modal */}
       {showAddWorkout && (
         <AddWorkoutModal
-        onClose={() => setShowAddWorkout(false)}
-        onAdd={addWorkout}
+          onClose={() => setShowAddWorkout(false)}
+          onAdd={handleAddWorkout}
         />
       )}
       {showAuthModal && (

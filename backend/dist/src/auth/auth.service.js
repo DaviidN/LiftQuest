@@ -79,7 +79,7 @@ let AuthService = class AuthService {
             email: user.email,
         });
         return {
-            token,
+            token: token,
             user: {
                 id: user.id,
                 email: user.email,
@@ -121,6 +121,8 @@ let AuthService = class AuthService {
                 email: true,
                 username: true,
                 totalXP: true,
+                workouts: true,
+                unlockedAchievements: true,
             },
         });
     }

@@ -1,4 +1,4 @@
-import { IsString, IsDateString, IsArray, IsNumber, IsOptional, ValidateNested } from 'class-validator';
+import { IsString, IsDateString, IsArray, IsNumber, IsOptional, ValidateNested, IsBoolean } from 'class-validator';
 import { Type } from 'class-transformer';
 
 class SetDto {
@@ -45,4 +45,8 @@ export class CreateWorkoutDto {
   @IsOptional()
   @IsNumber()
   distance?: number;
+
+  @IsOptional()
+  @IsBoolean()
+  prAchieved?: boolean;
 }

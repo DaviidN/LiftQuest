@@ -46,7 +46,7 @@ export class AuthService {
     });
 
     return {
-      token,
+      token: token,
       user: {
         id: user.id,
         email: user.email,
@@ -98,6 +98,8 @@ export class AuthService {
         email: true,
         username: true,
         totalXP: true,
+        workouts: true,
+        unlockedAchievements: true,
       },
     });
   }

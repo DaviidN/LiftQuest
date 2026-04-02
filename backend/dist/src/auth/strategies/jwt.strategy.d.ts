@@ -14,6 +14,24 @@ export declare class JwtStrategy extends JwtStrategy_base {
         username: string;
         id: string;
         totalXP: number;
+        workouts: {
+            id: string;
+            createdAt: Date;
+            userId: string;
+            date: Date;
+            type: string;
+            xpEarned: number;
+            prAchieved: boolean;
+            time: number | null;
+            calories: number | null;
+            distance: number | null;
+        }[];
+        unlockedAchievements: {
+            id: string;
+            userId: string;
+            achievementId: string;
+            unlockedAt: Date;
+        }[];
     }>;
 }
 export {};

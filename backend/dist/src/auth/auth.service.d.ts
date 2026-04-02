@@ -29,5 +29,23 @@ export declare class AuthService {
         username: string;
         id: string;
         totalXP: number;
+        workouts: {
+            id: string;
+            createdAt: Date;
+            userId: string;
+            date: Date;
+            type: string;
+            xpEarned: number;
+            prAchieved: boolean;
+            time: number | null;
+            calories: number | null;
+            distance: number | null;
+        }[];
+        unlockedAchievements: {
+            id: string;
+            userId: string;
+            achievementId: string;
+            unlockedAt: Date;
+        }[];
     } | null>;
 }

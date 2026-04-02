@@ -23,6 +23,7 @@ export declare class WorkoutsController {
         date: Date;
         type: string;
         xpEarned: number;
+        prAchieved: boolean;
         time: number | null;
         calories: number | null;
         distance: number | null;
@@ -47,6 +48,7 @@ export declare class WorkoutsController {
         date: Date;
         type: string;
         xpEarned: number;
+        prAchieved: boolean;
         time: number | null;
         calories: number | null;
         distance: number | null;
@@ -75,6 +77,7 @@ export declare class WorkoutsController {
         date: Date;
         type: string;
         xpEarned: number;
+        prAchieved: boolean;
         time: number | null;
         calories: number | null;
         distance: number | null;

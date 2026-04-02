@@ -21,11 +21,12 @@ let WorkoutsService = class WorkoutsService {
         this.usersService = usersService;
     }
     async create(userId, dto) {
-        let xpEarned = 50;
+        let xpEarned = 0;
+        let newPR = false;
         if (dto.type === 'strength' && dto.exercises) {
             xpEarned += dto.exercises.length * 10;
             for (const exercise of dto.exercises) {
-                const best1RM = this.calculate1RM(exercise.sets);
+                const maxWeight = Math.max(...exercise.sets.map(s => s.weight));
                 const previousWorkouts = await this.prisma.workout.findMany({
                     where: {
                         userId,
@@ -45,18 +46,30 @@ let WorkoutsService = class WorkoutsService {
                 let previousBest = 0;
                 for (const workout of previousWorkouts) {
                     for (const ex of workout.exercises) {
-                        const rm = this.calculate1RM(ex.sets);
-                        if (rm > previousBest)
-                            previousBest = rm;
+                        const previousMax = Math.max(...ex.sets.map(s => s.weight));
+                        if (previousMax > previousBest)
+                            previousBest = previousMax;
                     }
                 }
-                if (best1RM > previousBest && previousBest > 0) {
+                if (maxWeight > previousBest && previousBest > 0) {
                     xpEarned += 20;
+                    newPR = true;
+                }
+                for (const set of exercise.sets) {
+                    const estimated1RM = this.calculate1RM([set]);
+                    const intensity = set.weight / estimated1RM;
+                    let setXP = set.weight * set.reps * (1 + intensity);
+                    if (set.reps <= 3) {
+                        setXP *= 1.3;
+                    }
+                    xpEarned += Math.floor(setXP / 10);
                 }
             }
         }
         else {
-            xpEarned += 30;
+            const calPerMin = dto.calories / (dto.time / 60);
+            const airBikeXP = dto.calories * 0.5 + calPerMin * 5 + dto.time * 0.2;
+            xpEarned = Math.floor(airBikeXP / 10);
         }
         const workout = await this.prisma.workout.create({
             data: {
@@ -67,6 +80,7 @@ let WorkoutsService = class WorkoutsService {
                 time: dto.time,
                 calories: dto.calories,
                 distance: dto.distance,
+                prAchieved: newPR,
                 exercises: dto.exercises ? {
                     create: dto.exercises.map(ex => ({
                         name: ex.name,
@@ -153,15 +167,12 @@ let WorkoutsService = class WorkoutsService {
         }));
     }
     calculate1RM(sets) {
-        let max = 0;
-        for (const set of sets) {
-            const rm = set.reps === 1
-                ? set.weight
-                : Math.round(set.weight * (1 + set.reps / 30));
-            if (rm > max)
-                max = rm;
-        }
-        return max;
+        if (sets.length === 0)
+            return 0;
+        const { weight, reps } = sets[0];
+        if (reps === 1)
+            return weight;
+        return Math.round(weight * (1 + reps / 30));
     }
 };
 exports.WorkoutsService = WorkoutsService;

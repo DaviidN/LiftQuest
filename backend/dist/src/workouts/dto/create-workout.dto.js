@@ -45,6 +45,7 @@ class CreateWorkoutDto {
     time;
     calories;
     distance;
+    prAchieved;
 }
 exports.CreateWorkoutDto = CreateWorkoutDto;
 __decorate([
@@ -77,4 +78,9 @@ __decorate([
     (0, class_validator_1.IsNumber)(),
     __metadata("design:type", Number)
 ], CreateWorkoutDto.prototype, "distance", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsBoolean)(),
+    __metadata("design:type", Boolean)
+], CreateWorkoutDto.prototype, "prAchieved", void 0);
 //# sourceMappingURL=create-workout.dto.js.map

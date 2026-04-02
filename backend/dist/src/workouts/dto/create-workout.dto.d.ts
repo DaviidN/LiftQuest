@@ -13,5 +13,6 @@ export declare class CreateWorkoutDto {
     time?: number;
     calories?: number;
     distance?: number;
+    prAchieved?: boolean;
 }
 export {};

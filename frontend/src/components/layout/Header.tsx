@@ -7,14 +7,10 @@ import type { Session } from '../../context/userSessContext';
 interface HeaderProps {
   user: Session | undefined;
   onHeaderBtnClick: () => void;
+  logOut: () => void;
 }
 
-export const Header: React.FC<HeaderProps> = ({ user, onHeaderBtnClick}) => {
-
-  function Logout () {
-    localStorage.clear();
-    window.location.reload();
-  };
+export const Header: React.FC<HeaderProps> = ({ user, onHeaderBtnClick, logOut }) => {
 
   return (
     <div className="flex items-center justify-between w-full mb-6 pt-2">
@@ -33,7 +29,7 @@ export const Header: React.FC<HeaderProps> = ({ user, onHeaderBtnClick}) => {
           <Button onClick={onHeaderBtnClick} icon={Plus}>
             New Workout
           </Button>
-          <UserMenu username={user.name} onLogout={Logout} />
+          <UserMenu username={user.username} onLogout={logOut} />
         </div>
       </>
     }

@@ -33,6 +33,7 @@ model Workout {
   type      String   // 'strength' or 'airbike'
   xpEarned  Int      @default(0)
   createdAt DateTime @default(now())
+  prAchieved Boolean @default(false)
 
   // For airbike workouts
   time      Int?

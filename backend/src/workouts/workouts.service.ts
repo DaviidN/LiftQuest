@@ -12,14 +12,15 @@ export class WorkoutsService {
 
   async create(userId: string, dto: CreateWorkoutDto) {
     // Calculate XP
-    let xpEarned = 50; // Base XP
-
+    let xpEarned = 0; // Base XP
+    let newPR = false; 
+    
     if (dto.type === 'strength' && dto.exercises) {
       xpEarned += dto.exercises.length * 10;
 
       // Check for PRs
       for (const exercise of dto.exercises) {
-        const best1RM = this.calculate1RM(exercise.sets);
+        const maxWeight = Math.max(...exercise.sets.map(s => s.weight));
         
         // Get previous best for this exercise
         const previousWorkouts = await this.prisma.workout.findMany({
@@ -42,17 +43,37 @@ export class WorkoutsService {
         let previousBest = 0;
         for (const workout of previousWorkouts) {
           for (const ex of workout.exercises) {
-            const rm = this.calculate1RM(ex.sets);
-            if (rm > previousBest) previousBest = rm;
+            const previousMax = Math.max(...ex.sets.map(s => s.weight));
+            if (previousMax > previousBest) previousBest = previousMax;
           }
         }
 
-        if (best1RM > previousBest && previousBest > 0) {
-          xpEarned += 20; // PR bonus
+        if (maxWeight > previousBest && previousBest > 0) {
+          xpEarned += 20;
+          newPR = true;
         }
+
+        // Base XP based on intensity for each set
+        for (const set of exercise.sets) {
+          const estimated1RM = this.calculate1RM([set]);
+          const intensity = set.weight / estimated1RM;
+
+          let setXP = set.weight * set.reps * (1 + intensity);
+
+          // Bonus for heavy singles/doubles/triples
+          if (set.reps <= 3) {
+            setXP *= 1.3;
+          }
+
+          xpEarned += Math.floor(setXP / 10);
+
       }
+    }
     } else {
-      xpEarned += 30; // Cardio bonus
+      // Airbike XP based on calories, time, and intensity
+      const calPerMin = dto.calories! / (dto.time! / 60);
+      const airBikeXP = dto.calories! * 0.5 + calPerMin * 5 + dto.time! * 0.2;
+      xpEarned = Math.floor(airBikeXP / 10); // Scale down for balance
     }
 
     // Create workout
@@ -65,6 +86,7 @@ export class WorkoutsService {
         time: dto.time,
         calories: dto.calories,
         distance: dto.distance,
+        prAchieved: newPR,
         exercises: dto.exercises ? {
           create: dto.exercises.map(ex => ({
             name: ex.name,
@@ -169,13 +191,10 @@ export class WorkoutsService {
   }
 
   private calculate1RM(sets: any[]): number {
-    let max = 0;
-    for (const set of sets) {
-      const rm = set.reps === 1 
-        ? set.weight 
-        : Math.round(set.weight * (1 + set.reps / 30));
-      if (rm > max) max = rm;
-    }
-    return max;
+    if (sets.length === 0) return 0;
+
+    const { weight, reps } = sets[0];
+    if (reps === 1) return weight;
+    return Math.round(weight * (1 + reps / 30)); 
   }
 }

@@ -3,12 +3,13 @@ import { PrismaService } from 'prisma/prisma.service';
 import { UsersService } from '../users/users.service';
 
 const ACHIEVEMENTS = [
-  { code: 'FIRST_WORKOUT', name: 'First Blood', description: 'Complete your first workout', icon: '🥉', xp: 50 },
-  { code: 'THREE_IN_WEEK', name: 'Consistency', description: '3 workouts in a week', icon: '🥈', xp: 100 },
-  { code: 'NEW_PR', name: 'Stronger', description: 'Set a new personal record', icon: '🔥', xp: 150 },
-  { code: 'STREAK_7', name: 'On Fire', description: '7 day workout streak', icon: '⚡', xp: 200 },
-  { code: 'TOTAL_100', name: 'Century', description: '100 total workouts', icon: '💯', xp: 500 },
-  { code: 'AIRBIKE_BEAST', name: 'Cardio King', description: '10 airbike workouts', icon: '🚴', xp: 150 },
+  { code: 'FIRST_WORKOUT', name: 'First Blood', description: 'First workout', icon: '🥇', xp: 50 },
+  { code: 'THREE_IN_WEEK', name: 'Consistency', description: '3 workouts in a week', icon: '📅', xp: 100 },
+  { code: 'NEW_PR', name: 'Stronger', description: 'New personal record', icon: '⚡', xp: 150 },
+  { code: 'PR_MADNESS', name: 'PR Madness', description: '5 new PRs in a month', icon: '🏆', xp: 500 },
+  { code: 'STREAK_7', name: 'On Fire', description: '7 days in a row', icon: '🔥', xp: 250 },
+  { code: 'TOTAL_100', name: 'Century', description: '100 workouts total', icon: '💯', xp: 10000 },
+  { code: 'AIRBIKE_BEAST', name: 'Cardio King', description: '10 airbike workouts', icon: '🚴', xp: 400},
 ];
 
 @Injectable()
@@ -45,7 +46,7 @@ export class AchievementsService implements OnModuleInit {
 
   async checkAndUnlock(userId: string) {
     const unlocked: string[] = [];
-
+    
     // Get user's workouts
     const workouts = await this.prisma.workout.findMany({
       where: { userId },
@@ -64,6 +65,25 @@ export class AchievementsService implements OnModuleInit {
     if (workouts.length === 1 && !unlockedCodes.includes('FIRST_WORKOUT')) {
       await this.unlockAchievement(userId, 'FIRST_WORKOUT');
       unlocked.push('FIRST_WORKOUT');
+    }
+
+    // New PR
+    const hasNewPR = workouts.some(w => w.type === 'strength' && w.prAchieved);
+    if (hasNewPR && !unlockedCodes.includes('NEW_PR')) {
+      await this.unlockAchievement(userId, 'NEW_PR');
+      unlocked.push('NEW_PR');
+    }
+
+    // 5 PRs in a month
+    const lastMonthPRs = workouts
+      .filter(w => {
+        const diff = Date.now() - new Date(w.date).getTime();
+        return w.type === 'strength' && w.prAchieved && diff < 30 * 24 * 60 * 60 * 1000;
+      });
+
+    if (lastMonthPRs.length >= 5 && !unlockedCodes.includes('PR_MADNESS')) {
+      await this.unlockAchievement(userId, 'PR_MADNESS');
+      unlocked.push('PR_MADNESS');
     }
 
     // Check THREE_IN_WEEK

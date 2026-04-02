@@ -1,66 +1,52 @@
 import React, { useState } from "react";
 import { X, Mail, Lock, User } from "lucide-react";
 import { Button } from "../UI/Button";
-import { useAuth } from "../../context/userSessContext";
 import { Input } from "../UI/Input";
+import { useAuthActions } from "../../hooks/userAuthActions";
+
 
 interface AuthModalProps {
   onClose: () => void;
-  loading?: boolean;
-  error?: string | null;
 }
 
 export const AuthModal: React.FC<AuthModalProps> = ({
   onClose,
-  loading = false,
-  error = null,
 }) => {
   const [mode, setMode] = useState<'login' | 'signup'>('login');
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [username, setUsername] = useState("");
-  const [touched, setTouched] = useState({ email: false, password: false, username: false });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [touched, setTouched] = useState({
+    email: false,
+    password: false,
+    username: false,
+  });
 
-  const { setUserSess } = useAuth();
+  const { login, signup } = useAuthActions();
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setTouched({ email: true, password: true, username: true });
+    
+    if (!email || !password) return;
+    if (mode === 'signup' && !username) return;
 
-    setTouched({
-      email: true,
-      password: true,
-      username: true,
-    });
+    setLoading(true);
+    setError(null);
 
-    if (!email || !password || (mode === 'signup' && !username)) {
-      return;
-    }
-
-    if (mode === 'login') {
-      // Mock login function
-      const mockSession = {
-        id: 1,
-        token: 'mock-token',
-        name: "username",
-        workouts: [],
-        totalXP: 0,
-        unlockedAchievements: []
-      };
-      localStorage.setItem('session', JSON.stringify(mockSession));
-      setUserSess(mockSession);
+    try {
+      if (mode === 'login') {
+        await login(email, password);
+      } else {
+        await signup(email, password, username);
+      }
       onClose();
-    } else {
-      // Mock signup function (same as login for demo)
-      const mockSession = {
-        id: 1,
-        token: 'mock-token',
-        name: "username",
-        workouts: [],
-        totalXP: 0,
-        unlockedAchievements: []
-      };
-      localStorage.setItem('session', JSON.stringify(mockSession));
-      setUserSess(mockSession);
-      onClose();
+    } catch (err: any) {
+      setError(`${err.message.charAt(0).toUpperCase() + err.message.slice(1)}!` || 'Authentication failed!');
+    } finally {
+      setLoading(false);
     }
   };
 
