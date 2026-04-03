@@ -20,4 +20,4 @@ RUN npx prisma generate
 EXPOSE 3001
 
 # Start command (will be overridden by docker-compose)
-CMD ["npm", "run", "start:dev"]
+CMD ["sh", "-c", "echo 'DATABASE_URL:' $DATABASE_URL && echo 'Running migrations...' && npx prisma migrate deploy && echo 'Migrations done!' && node dist/src/main.js"]

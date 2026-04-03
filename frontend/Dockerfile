@@ -16,4 +16,4 @@ COPY . .
 EXPOSE 5173
 
 # Start command (will be overridden by docker-compose)
-CMD ["npm", "run", "dev"]
+CMD ["npm", "run", "preview", "--", "--host", "--port", "5173"]
