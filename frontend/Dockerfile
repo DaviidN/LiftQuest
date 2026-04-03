@@ -1,26 +1,19 @@
-FROM node:20-alpine AS builder
-
-WORKDIR /app
-
-COPY package*.json ./
-
-RUN npm install
-
-COPY . .
-
-RUN npm run build
-
-# Production stage
 FROM node:20-alpine
 
+# Set working directory
 WORKDIR /app
 
+# Copy package files
 COPY package*.json ./
 
-RUN npm install --production
+# Install dependencies
+RUN npm install
 
-COPY --from=builder /app/dist ./dist
+# Copy source code
+COPY . .
 
+# Expose port
 EXPOSE 5173
 
-CMD ["npm", "run", "preview", "--", "--host", "--port", "5173"]
+# Start command (will be overridden by docker-compose)
+CMD ["npm", "run", "dev"]
