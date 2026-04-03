@@ -5,7 +5,9 @@
     "buildCommand": "npm install && npx prisma generate && npm run build"
   },
   "deploy": {
-    "startCommand": "npx prisma migrate deploy && npm run start:prod",
-    "restartPolicyType": "ON_FAILURE"
+    "startCommand": "npx prisma migrate deploy && node dist/src/main.js",
+    "restartPolicyType": "ON_FAILURE",
+    "healthcheckPath": "/api",
+    "healthcheckTimeout": 120
   }
 }
