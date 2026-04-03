@@ -5,24 +5,22 @@ import { AppModule } from './app.module';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  // Enable CORS for frontend
+  // Enable CORS - allow Railway frontend
   app.enableCors({
-    origin: 'http://localhost:5173', // Your Vite dev server
+    origin: process.env.FRONTEND_URL || 'http://localhost:5173',
     credentials: true,
   });
 
-  // Enable validation
   app.useGlobalPipes(new ValidationPipe({
     whitelist: true,
     transform: true,
   }));
 
-  // Set global prefix
   app.setGlobalPrefix('api');
 
   const port = process.env.PORT || 3001;
-  await app.listen(port);
+  await app.listen(port, '0.0.0.0'); 
   
-  console.log(`Server running on http://localhost:${port}`);
+  console.log(`🚀 Server running on port ${port}`);
 }
 bootstrap();
