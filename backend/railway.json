@@ -1,8 +1,8 @@
 {
   "$schema": "https://railway.app/railway.schema.json",
   "build": {
-    "builder": "NIXPACKS",
-    "buildCommand": "npm install && npx prisma generate && npm run build"
+    "builder": "DOCKERFILE",
+    "dockerfilePath": "Dockerfile"
   },
   "deploy": {
     "startCommand": "echo '--- Starting Migration ---' && npx prisma migrate deploy && echo '--- Migration Done, Checking Files ---' && ls -R dist/src && echo '--- Starting Node Server ---' && node dist/src/main.js",
