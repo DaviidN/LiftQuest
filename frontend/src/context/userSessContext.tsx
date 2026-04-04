@@ -15,7 +15,6 @@ type AuthContextType = {
     userSess: Session | undefined;
     setUserSess: (val: Session | undefined) => void;
     isLoading: boolean;
-    setIsLoading: (val: boolean) => void;
 };
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -44,6 +43,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         loadSession();
     }, []);
 
+    const safeSetUserSess = (val: Session | undefined) => {
+        requestAnimationFrame(() => {
+            setUserSess(val);
+        });
+    };
+
     // Save to localStorage whenever userSess changes
     useEffect(() => {
         if (userSess) {
@@ -54,7 +59,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }, [userSess]);
 
     return (
-        <AuthContext.Provider value={{ userSess, setUserSess, isLoading, setIsLoading }}>
+        <AuthContext.Provider value={{ userSess, setUserSess: safeSetUserSess, isLoading }}>
             {children}
         </AuthContext.Provider>
     );

@@ -3,7 +3,6 @@ import { X, Mail, Lock, User } from "lucide-react";
 import { Button } from "../UI/Button";
 import { Input } from "../UI/Input";
 import { useAuthActions } from "../../hooks/userAuthActions";
-import { useAuth } from '../../context/userSessContext';
 
 
 interface AuthModalProps {
@@ -17,7 +16,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [username, setUsername] = useState("");
-  /* const [loading, setLoading] = useState(false); */
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [touched, setTouched] = useState({
     email: false,
@@ -26,7 +25,6 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   });
 
   const { login, signup } = useAuthActions();
-  const { isLoading, setIsLoading } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,7 +33,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     if (!email || !password) return;
     if (mode === 'signup' && !username) return;
 
-    setIsLoading(true);
+    setLoading(true);
     setError(null);
 
     try {
@@ -44,9 +42,11 @@ export const AuthModal: React.FC<AuthModalProps> = ({
       } else {
         await signup(email, password, username);
       }
+      onClose();
     } catch (err: any) {
       setError(`${err.message.charAt(0).toUpperCase() + err.message.slice(1)}!` || 'Authentication failed!');
-      setIsLoading(false);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -178,7 +178,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             fullWidth
             className="mt-6"
           >
-            {isLoading ? (
+            {loading ? (
               <div className="flex items-center gap-2">
                 <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                 Loading...
