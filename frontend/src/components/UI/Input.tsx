@@ -5,7 +5,7 @@ interface InputProps {
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   placeholder?: string;
   type?: string;
-  signup?: boolean;
+  auth?: boolean;
   className?: string;
 }
 
@@ -14,12 +14,12 @@ export const Input: React.FC<InputProps> = ({
   onChange,
   placeholder,
   type = 'text',
-  signup = false,
+  auth = false,
   className,
 }) => {
     
     const inputProps: React.InputHTMLAttributes<HTMLInputElement> = {};
-    if(type === 'text' && !signup ) {
+    if(type === 'text' && !auth  ) {
         inputProps.inputMode = 'numeric';
         inputProps.onInput = (e) => {
             const input = e.target as HTMLInputElement;

@@ -175,8 +175,8 @@ const WorkoutTracker = () => {
 
         :
         <div className="bg-white/10 backdrop-blur-lg rounded-xl p-12 text-center">
-          <CircleQuestionMark className="w-16 h-16 mx-auto mb-4 text-gray-400" />
-          <p className="text-gray-400">Login to start your workout journey!</p>
+          <CircleQuestionMark className="w-16 h-16 mx-auto mb-4 "/>
+          <p>Login to start your workout journey!</p>
         </div>
       }
 

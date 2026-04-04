@@ -17,6 +17,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   const [password, setPassword] = useState("");
   const [username, setUsername] = useState("");
   const [loading, setLoading] = useState(false);
+  const [passVis, setPassVis] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [touched, setTouched] = useState({
     email: false,
@@ -43,17 +44,18 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         await signup(email, password, username);
       }
       
+      onClose();
     } catch (err: any) {
       setError(`${err.message.charAt(0).toUpperCase() + err.message.slice(1)}!` || 'Authentication failed!');
       setLoading(false);
     } finally {
-      onClose();
       setLoading(false);
     }
   };
 
   const switchMode = () => {
     setMode(mode === 'login' ? 'signup' : 'login');
+    setError(null);
     setEmail('');
     setPassword('');
     setUsername('');
@@ -105,7 +107,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                 <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                 <Input
                   type="text"
-                  signup
+                  auth
                   placeholder="johndoe"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
@@ -150,9 +152,10 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               Password
             </label>
             <div className="relative">
-              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <Lock className="absolute left-2 top-1/2 -translate-y-1/2 w-7 h-7 p-1 rounded-xl text-gray-400 hover:cursor-pointer hover:text-gray-300 hover:bg-slate-800" onClick={() => setPassVis(!passVis)}/>
               <Input
-                type="password"
+                auth
+                type={ passVis ? "text" : "password"}
                 placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}

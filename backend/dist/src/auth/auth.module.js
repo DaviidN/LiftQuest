@@ -23,7 +23,7 @@ exports.AuthModule = AuthModule = __decorate([
             jwt_1.JwtModule.registerAsync({
                 useFactory: () => ({
                     secret: process.env.JWT_SECRET,
-                    signOptions: { expiresIn: '7d' },
+                    signOptions: { expiresIn: '1h' },
                 }),
             }),
         ],
