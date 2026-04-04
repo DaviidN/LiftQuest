@@ -46,6 +46,8 @@ export const useAuthActions = () => {
             unlockedAchievements: [],
         };
 
+        setTimeout
+        
         setUserSess(session);
         return session;
     };

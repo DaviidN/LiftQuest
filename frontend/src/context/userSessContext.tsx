@@ -15,6 +15,7 @@ type AuthContextType = {
     userSess: Session | undefined;
     setUserSess: (val: Session | undefined) => void;
     isLoading: boolean;
+    setIsLoading: (val: boolean) => void;
 };
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -22,13 +23,6 @@ const AuthContext = createContext<AuthContextType | null>(null);
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const [userSess, setUserSess] = useState<Session | undefined>(undefined);
     const [isLoading, setIsLoading] = useState(true);
-
-    const updateSess = (val: Session | undefined) => {
-        setUserSess(prev => {
-            if (!prev && !val) return prev;
-            return val;
-        });
-    };
 
     useEffect(() => {
         const loadSession = async () => {
@@ -60,7 +54,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }, [userSess]);
 
     return (
-        <AuthContext.Provider value={{ userSess, setUserSess: updateSess, isLoading }}>
+        <AuthContext.Provider value={{ userSess, setUserSess, isLoading, setIsLoading }}>
             {children}
         </AuthContext.Provider>
     );
