@@ -1,3 +1,4 @@
+import React, { useEffect } from 'react';
 import { useAuth } from '../context/userSessContext';
 import { api } from '../services/api';
 import type { Workout } from '../types/workout.types';
@@ -5,6 +6,13 @@ import type { Session } from '../context/userSessContext';
 
 export const useAuthActions = () => {
     const { userSess, setUserSess } = useAuth();
+    const isMounted = React.useRef(true);
+
+    useEffect(() => {
+        return () => {
+            isMounted.current = false;
+        };
+    }, []);
 
     const login = async (email: string, password: string) => {
         const response = await api.login(email, password);
@@ -27,7 +35,10 @@ export const useAuthActions = () => {
             unlockedAchievements: userAchievements.map((ua: any) => ua.achievement.code),
         };
 
-        setUserSess(session);
+        if (isMounted.current) {
+            setUserSess(session);
+        }
+        
         return session;
     };
 
@@ -46,7 +57,10 @@ export const useAuthActions = () => {
             unlockedAchievements: [],
         };
 
-        setUserSess(session);
+        if (isMounted.current) {
+            setUserSess(session);
+        }
+
         return session;
     };
 
@@ -68,14 +82,14 @@ export const useAuthActions = () => {
             api.getUserAchievements(),
         ]);
 
-        if (userSess) {
-        const updatedSession: Session = {
-            ...userSess,
-            workouts: workouts,
-            totalXP: profile.totalXP,
-            unlockedAchievements: userAchievements.map((ua: any) => ua.achievement.code),
-        };
-        setUserSess(updatedSession);
+        if (isMounted.current && userSess) {
+            const updatedSession: Session = {
+                ...userSess,
+                workouts: workouts,
+                totalXP: profile.totalXP,
+                unlockedAchievements: userAchievements.map((ua: any) => ua.achievement.code),
+            };
+            setUserSess(updatedSession);
         }
 
         return { newWorkout, unlockedAchievements };
@@ -91,15 +105,17 @@ export const useAuthActions = () => {
             api.getUserAchievements(),
         ]);
 
-        setUserSess({
-            id: profile.id,
-            email: profile.email,
-            username: profile.username,
-            token: token,
-            workouts: workouts,
-            totalXP: profile.totalXP,
-            unlockedAchievements: userAchievements.map((ua: any) => ua.achievement.code),
-        });
+        if (isMounted.current) {
+            setUserSess({
+                id: profile.id,
+                email: profile.email,
+                username: profile.username,
+                token: token,
+                workouts: workouts,
+                totalXP: profile.totalXP,
+                unlockedAchievements: userAchievements.map((ua: any) => ua.achievement.code),
+            });
+        }
     };
 
     return {
