@@ -1,5 +1,7 @@
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 
+  console.log(import.meta.env.VITE_API_URL);
+
 // Types
 export interface LoginResponse {
   token: string;

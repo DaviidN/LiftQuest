@@ -59,8 +59,6 @@ const WorkoutTracker = () => {
     }
   };
 
-  console.log(import.meta.env.VITE_API_URL);
-
   // Loading state
   if (isLoading) {
     return (
