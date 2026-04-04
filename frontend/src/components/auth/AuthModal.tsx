@@ -5,7 +5,6 @@ import { Input } from "../UI/Input";;
 import { api } from '../../services/api';
 import { useAuth } from '../../context/userSessContext';
 
-
 interface AuthModalProps {
   onClose: () => void;
 }
@@ -25,6 +24,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     username: false,
   });
   const isMounted = React.useRef(true);
+  const API_URL = 'https://liftquest-be-production.up.railway.app/api';
+
 
   useEffect(() => {
     isMounted.current = true;
@@ -35,41 +36,59 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
   const { setUserSess } = useAuth();
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  async function login(e: React.FormEvent): Promise<void> {
     e.preventDefault();
     setTouched({ email: true, password: true, username: true });
     
-    if (!email || !password) return;
-    if (mode === 'signup' && !username) return;
+    if (!email || !password) {
+        setError("Please fill in all fields");
+        return; 
+    }
+    if (mode === 'signup' && !username) {
+        setError("Username is required");
+        return;
+    }
 
     setLoading(true);
     setError(null);
 
     try {
-      if (mode === 'login') {
-        const response = await api.login(email, password);
-        localStorage.setItem('authToken', response.token);
+      /* if (mode === 'login') { */
+        {
+            const response = await fetch(`${API_URL}/auth/login`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({ email, password }),
+            });
         
-        // Fetch full user data
+            if (!response.ok) {
+              const error = await response.json();
+              throw new Error(error.message || 'Login failed');
+            }
+        
+        const data = await response.json();
+
+        localStorage.setItem('authToken', data.token);
+        
         const [workouts, userAchievements] = await Promise.all([
             api.getWorkouts(),
             api.getUserAchievements(),
         ]);
 
         const session = {
-            id: response.user.id,
-            email: response.user.email,
-            username: response.user.username,
-            token: response.token,
+            id: data.user.id,
+            email: data.user.email,
+            username: data.user.username,
+            token: data.token,
             workouts: workouts,
-            totalXP: response.user.totalXP,
+            totalXP: data.user.totalXP,
             unlockedAchievements: userAchievements.map((ua: any) => ua.achievement.code),
         };
 
         setUserSess(session);
-
-        return session;
-      } else {
+      /* } else {
         const response = await api.signup(email, password, username);
         
         localStorage.setItem('authToken', response.token);
@@ -87,8 +106,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         if (isMounted.current) {
             setUserSess(session);
         }
-
-        return session;
+ */
+        /* return session; */
       }
     } catch (err: any) {
       if (isMounted.current) {
@@ -141,7 +160,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+        <form onSubmit={/* handleSubmit */ login} className="p-6 space-y-4">
           {mode === 'signup' && (
             <div>
               <label className="block text-sm font-medium mb-2 text-gray-300">
