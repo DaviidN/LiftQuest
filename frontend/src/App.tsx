@@ -30,8 +30,10 @@ const WorkoutTracker = () => {
   const { logout, addWorkout } = useAuthActions();
   
   // Load achievements on mount if user is logged in
-  { userSess && useEffect(() => {
+  useEffect(() => {
     const fetchAchievements = async () => {
+      if (!userSess) return;
+
       try {
         const data = await api.getAchievements();
         setAchievements(data);
@@ -40,8 +42,8 @@ const WorkoutTracker = () => {
       }
     };
     fetchAchievements();
-    }, []);
-  }
+    }, [userSess]);
+  
 
  const handleAddWorkout = async (workout: Workout) => {
     try {
@@ -187,7 +189,7 @@ const WorkoutTracker = () => {
       )}
       {showAuthModal && (
         <AuthModal
-          onClose={() => {}}
+          onClose={() => setShowAuthModal(false)}
         />
       )}
     </div>
