@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { X, Mail, Lock, User } from "lucide-react";
 import { Button } from "../UI/Button";
-import { Input } from "../UI/Input";
-import { useAuthActions } from "../../hooks/userAuthActions";
+import { Input } from "../UI/Input";;
+import { api } from '../../services/api';
+import { useAuth } from '../../context/userSessContext';
 
 
 interface AuthModalProps {
@@ -32,7 +33,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     };
   }, []);
 
-  const { login, signup } = useAuthActions();
+  const { setUserSess } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -46,9 +47,48 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
     try {
       if (mode === 'login') {
-        await login(email, password);
+        const response = await api.login(email, password);
+        localStorage.setItem('authToken', response.token);
+        
+        // Fetch full user data
+        const [workouts, userAchievements] = await Promise.all([
+            api.getWorkouts(),
+            api.getUserAchievements(),
+        ]);
+
+        const session = {
+            id: response.user.id,
+            email: response.user.email,
+            username: response.user.username,
+            token: response.token,
+            workouts: workouts,
+            totalXP: response.user.totalXP,
+            unlockedAchievements: userAchievements.map((ua: any) => ua.achievement.code),
+        };
+
+        setUserSess(session);
+
+        return session;
       } else {
-        await signup(email, password, username);
+        const response = await api.signup(email, password, username);
+        
+        localStorage.setItem('authToken', response.token);
+
+        const session = {
+            id: response.user.id,
+            email: response.user.email,
+            username: response.user.username,
+            token: response.token,
+            workouts: [],
+            totalXP: response.user.totalXP,
+            unlockedAchievements: [],
+        };
+
+        if (isMounted.current) {
+            setUserSess(session);
+        }
+
+        return session;
       }
     } catch (err: any) {
       if (isMounted.current) {
