@@ -16,37 +16,30 @@ export const useAuthActions = () => {
 
     const login = async (email: string, password: string) => {
         const response = await api.login(email, password);
-        const controller = new AbortController();
+        
+        localStorage.setItem('authToken', response.token);
+        
+        // Fetch full user data
+        const [workouts, userAchievements] = await Promise.all([
+            api.getWorkouts(),
+            api.getUserAchievements(),
+        ]);
 
-        try { 
+        const session = {
+            id: response.user.id,
+            email: response.user.email,
+            username: response.user.username,
+            token: response.token,
+            workouts: workouts,
+            totalXP: response.user.totalXP,
+            unlockedAchievements: userAchievements.map((ua: any) => ua.achievement.code),
+        };
 
-            localStorage.setItem('authToken', response.token);
-            
-            // Fetch full user data
-            const [workouts, userAchievements] = await Promise.all([
-                api.getWorkouts(),
-                api.getUserAchievements(),
-            ]);
-            
-            const session = {
-                id: response.user.id,
-                email: response.user.email,
-                username: response.user.username,
-                token: response.token,
-                workouts: workouts,
-                totalXP: response.user.totalXP,
-                unlockedAchievements: userAchievements.map((ua: any) => ua.achievement.code),
-            };
-            
-            if (isMounted.current) {
-                setUserSess(session);
-            }
-            
-            return session;
-        } catch (err: any) {
-            if (err.name === 'AbortError') return;
-            throw err;
+        if (isMounted.current) {
+            setUserSess(session);
         }
+        
+        return session;
     };
 
     const signup = async (email: string, password: string, username: string) => {

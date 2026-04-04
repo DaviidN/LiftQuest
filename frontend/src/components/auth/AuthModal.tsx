@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { X, Mail, Lock, User } from "lucide-react";
 import { Button } from "../UI/Button";
 import { Input } from "../UI/Input";
@@ -23,6 +23,14 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     password: false,
     username: false,
   });
+  const isMounted = React.useRef(true);
+
+  useEffect(() => {
+    isMounted.current = true;
+    return () => {
+      isMounted.current = false;
+    };
+  }, []);
 
   const { login, signup } = useAuthActions();
 
@@ -43,10 +51,11 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         await signup(email, password, username);
       }
     } catch (err: any) {
-      setError(`${err.message.charAt(0).toUpperCase() + err.message.slice(1)}!` || 'Authentication failed!');
-    } finally {
-      setLoading(false);
-    }
+      if (isMounted.current) {
+        setError(`${err.message.charAt(0).toUpperCase() + err.message.slice(1)}!` || 'Authentication failed!');
+        setLoading(false);
+      }
+    } 
   };
 
   const switchMode = () => {
