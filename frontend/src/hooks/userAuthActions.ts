@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useAuth } from '../context/userSessContext';
 import { api } from '../services/api';
 import type { Workout } from '../types/workout.types';
@@ -6,7 +6,7 @@ import type { Session } from '../context/userSessContext';
 
 export const useAuthActions = () => {
     const { userSess, setUserSess } = useAuth();
-    const isMounted = React.useRef(true);
+    const isMounted = useRef(true);
 
     useEffect(() => {
         return () => {
@@ -16,30 +16,37 @@ export const useAuthActions = () => {
 
     const login = async (email: string, password: string) => {
         const response = await api.login(email, password);
-        
-        localStorage.setItem('authToken', response.token);
-        
-        // Fetch full user data
-        const [workouts, userAchievements] = await Promise.all([
-            api.getWorkouts(),
-            api.getUserAchievements(),
-        ]);
+        const controller = new AbortController();
 
-        const session = {
-            id: response.user.id,
-            email: response.user.email,
-            username: response.user.username,
-            token: response.token,
-            workouts: workouts,
-            totalXP: response.user.totalXP,
-            unlockedAchievements: userAchievements.map((ua: any) => ua.achievement.code),
-        };
+        try { 
 
-        if (isMounted.current) {
-            setUserSess(session);
+            localStorage.setItem('authToken', response.token);
+            
+            // Fetch full user data
+            const [workouts, userAchievements] = await Promise.all([
+                api.getWorkouts(),
+                api.getUserAchievements(),
+            ]);
+            
+            const session = {
+                id: response.user.id,
+                email: response.user.email,
+                username: response.user.username,
+                token: response.token,
+                workouts: workouts,
+                totalXP: response.user.totalXP,
+                unlockedAchievements: userAchievements.map((ua: any) => ua.achievement.code),
+            };
+            
+            if (isMounted.current) {
+                setUserSess(session);
+            }
+            
+            return session;
+        } catch (err: any) {
+            if (err.name === 'AbortError') return;
+            throw err;
         }
-        
-        return session;
     };
 
     const signup = async (email: string, password: string, username: string) => {
@@ -67,7 +74,9 @@ export const useAuthActions = () => {
     const logout = () => {
         localStorage.removeItem('authToken');
         localStorage.removeItem('session');
-        setUserSess(undefined);
+        if (isMounted.current) {
+            setUserSess(undefined);
+        }
     };
 
     const addWorkout = async (workout: Workout) => {
