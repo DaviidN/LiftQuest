@@ -23,6 +23,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const [userSess, setUserSess] = useState<Session | undefined>(undefined);
     const [isLoading, setIsLoading] = useState(true);
 
+    const updateSess = (val: Session | undefined) => {
+        setUserSess(prev => {
+            if (!prev && !val) return prev;
+            return val;
+        });
+    };
+
     useEffect(() => {
         const loadSession = async () => {
             const token = localStorage.getItem("authToken");
@@ -53,7 +60,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }, [userSess]);
 
     return (
-        <AuthContext.Provider value={{ userSess, setUserSess, isLoading }}>
+        <AuthContext.Provider value={{ userSess, setUserSess: updateSess, isLoading }}>
             {children}
         </AuthContext.Provider>
     );

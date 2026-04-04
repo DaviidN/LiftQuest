@@ -16,7 +16,6 @@ export const useAuthActions = () => {
 
     const login = async (email: string, password: string) => {
         const response = await api.login(email, password);
-        
         localStorage.setItem('authToken', response.token);
         
         // Fetch full user data
@@ -35,10 +34,8 @@ export const useAuthActions = () => {
             unlockedAchievements: userAchievements.map((ua: any) => ua.achievement.code),
         };
 
-        if (isMounted.current) {
-            setUserSess(session);
-        }
-        
+        setUserSess(session);
+
         return session;
     };
 
