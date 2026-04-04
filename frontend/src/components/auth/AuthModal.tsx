@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { X, Mail, Lock, User } from "lucide-react";
 import { Button } from "../UI/Button";
-import { Input } from "../UI/Input";;
-import { api } from '../../services/api';
-import { useAuth } from '../../context/userSessContext';
+import { Input } from "../UI/Input";
+import { useAuthActions } from "../../hooks/userAuthActions";
+
 
 interface AuthModalProps {
   onClose: () => void;
@@ -23,98 +23,31 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     password: false,
     username: false,
   });
-  const isMounted = React.useRef(true);
-  const API_URL = 'https://liftquest-be-production.up.railway.app/api';
 
+  const { login, signup } = useAuthActions();
 
-  useEffect(() => {
-    isMounted.current = true;
-    return () => {
-      isMounted.current = false;
-    };
-  }, []);
-
-  const { setUserSess } = useAuth();
-
-  async function login(e: React.FormEvent): Promise<void> {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setTouched({ email: true, password: true, username: true });
     
-    if (!email || !password) {
-        setError("Please fill in all fields");
-        return; 
-    }
-    if (mode === 'signup' && !username) {
-        setError("Username is required");
-        return;
-    }
+    if (!email || !password) return;
+    if (mode === 'signup' && !username) return;
 
     setLoading(true);
     setError(null);
 
     try {
-      /* if (mode === 'login') { */
-        {
-            const response = await fetch(`${API_URL}/auth/login`, {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({ email, password }),
-            });
-        
-            if (!response.ok) {
-              const error = await response.json();
-              throw new Error(error.message || 'Login failed');
-            }
-        
-        const data = await response.json();
-
-        localStorage.setItem('authToken', data.token);
-        
-        const [workouts, userAchievements] = await Promise.all([
-            api.getWorkouts(),
-            api.getUserAchievements(),
-        ]);
-
-        const session = {
-            id: data.user.id,
-            email: data.user.email,
-            username: data.user.username,
-            token: data.token,
-            workouts: workouts,
-            totalXP: data.user.totalXP,
-            unlockedAchievements: userAchievements.map((ua: any) => ua.achievement.code),
-        };
-
-        setUserSess(session);
-      /* } else {
-        const response = await api.signup(email, password, username);
-        
-        localStorage.setItem('authToken', response.token);
-
-        const session = {
-            id: response.user.id,
-            email: response.user.email,
-            username: response.user.username,
-            token: response.token,
-            workouts: [],
-            totalXP: response.user.totalXP,
-            unlockedAchievements: [],
-        };
-
-        if (isMounted.current) {
-            setUserSess(session);
-        }
- */
-        /* return session; */
+      if (mode === 'login') {
+        await login(email, password);
+      } else {
+        await signup(email, password, username);
       }
     } catch (err: any) {
-      if (isMounted.current) {
-        setError(`${err.message.charAt(0).toUpperCase() + err.message.slice(1)}!` || 'Authentication failed!');
-        setLoading(false);
-      }
-    } 
+      setError(`${err.message.charAt(0).toUpperCase() + err.message.slice(1)}!` || 'Authentication failed!');
+    } finally {
+      onClose();
+      setLoading(false);
+    }
   };
 
   const switchMode = () => {
@@ -160,7 +93,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         </div>
 
         {/* Form */}
-        <form onSubmit={/* handleSubmit */ login} className="p-6 space-y-4">
+        <form onSubmit={handleSubmit} className="p-6 space-y-4">
           {mode === 'signup' && (
             <div>
               <label className="block text-sm font-medium mb-2 text-gray-300">

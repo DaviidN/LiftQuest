@@ -187,7 +187,7 @@ const WorkoutTracker = () => {
       )}
       {showAuthModal && (
         <AuthModal
-          onClose={() => {}}
+          onClose={() => setShowAuthModal(false)}
         />
       )}
     </div>
