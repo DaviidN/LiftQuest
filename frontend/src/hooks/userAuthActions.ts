@@ -26,8 +26,9 @@ export const useAuthActions = () => {
             totalXP: response.user.totalXP,
             unlockedAchievements: userAchievements.map((ua: any) => ua.achievement.code),
         };
-
-        setUserSess(session);
+        setTimeout(() => {
+            setUserSess(session);
+        },0)   
         return session;
     };
 
