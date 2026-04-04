@@ -42,11 +42,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({
       } else {
         await signup(email, password, username);
       }
-      onClose();
     } catch (err: any) {
       setError(`${err.message.charAt(0).toUpperCase() + err.message.slice(1)}!` || 'Authentication failed!');
-    } finally {
-      setLoading(false);
     }
   };
 
