@@ -29,8 +29,8 @@ const WorkoutTracker = () => {
   const { userSess, isLoading } = useAuth();
   const { logout, addWorkout } = useAuthActions();
   
-  // Load achievements on mount and after adding a workout
-  useEffect(() => {
+  // Load achievements on mount if user is logged in
+  { userSess && useEffect(() => {
     const fetchAchievements = async () => {
       try {
         const data = await api.getAchievements();
@@ -40,7 +40,8 @@ const WorkoutTracker = () => {
       }
     };
     fetchAchievements();
-  }, []);
+    }, []);
+  }
 
  const handleAddWorkout = async (workout: Workout) => {
     try {
@@ -57,6 +58,8 @@ const WorkoutTracker = () => {
       console.error('Failed to add workout:', error);
     }
   };
+
+  console.log(import.meta.env.VITE_API_URL);
 
   // Loading state
   if (isLoading) {
