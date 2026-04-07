@@ -47,12 +47,16 @@ const common_1 = require("@nestjs/common");
 const jwt_1 = require("@nestjs/jwt");
 const prisma_service_1 = require("../../prisma/prisma.service");
 const bcrypt = __importStar(require("bcrypt"));
+const crypto_1 = require("crypto");
+const email_service_1 = require("../email/email.service");
 let AuthService = class AuthService {
     prisma;
     jwtService;
-    constructor(prisma, jwtService) {
+    emailService;
+    constructor(prisma, jwtService, emailService) {
         this.prisma = prisma;
         this.jwtService = jwtService;
+        this.emailService = emailService;
     }
     async signup(dto) {
         const existingUser = await this.prisma.user.findFirst({
@@ -67,13 +71,18 @@ let AuthService = class AuthService {
             throw new common_1.ConflictException('Email or username already exists');
         }
         const hashedPassword = await bcrypt.hash(dto.password, 10);
+        const verificationToken = (0, crypto_1.randomUUID)();
+        const verificationExpires = new Date(Date.now() + 24 * 60 * 60 * 1000);
         const user = await this.prisma.user.create({
             data: {
                 email: dto.email,
                 username: dto.username,
                 password: hashedPassword,
+                emailVerificationToken: verificationToken,
+                emailVerificationExpires: verificationExpires,
             },
         });
+        await this.emailService.sendVerificationEmail(user.email, user.username, verificationToken);
         const token = this.jwtService.sign({
             sub: user.id,
             email: user.email,
@@ -85,6 +94,7 @@ let AuthService = class AuthService {
                 email: user.email,
                 username: user.username,
                 totalXP: user.totalXP,
+                isEmailVerified: user.isEmailVerified,
             },
         };
     }
@@ -110,6 +120,7 @@ let AuthService = class AuthService {
                 email: user.email,
                 username: user.username,
                 totalXP: user.totalXP,
+                isEmailVerified: user.isEmailVerified,
             },
         };
     }
@@ -126,11 +137,59 @@ let AuthService = class AuthService {
             },
         });
     }
+    async verifyEmail(token) {
+        const user = await this.prisma.user.findFirst({
+            where: {
+                emailVerificationToken: token,
+            },
+        });
+        if (!user) {
+            throw new common_1.BadRequestException('Invalid verification token');
+        }
+        if (user.isEmailVerified) {
+            throw new common_1.BadRequestException('Email already verified');
+        }
+        if (user.emailVerificationExpires && user.emailVerificationExpires < new Date()) {
+            throw new common_1.BadRequestException('Verification token has expired');
+        }
+        await this.prisma.user.update({
+            where: { id: user.id },
+            data: {
+                isEmailVerified: true,
+                emailVerificationToken: null,
+                emailVerificationExpires: null,
+            },
+        });
+        return { message: 'Email verified successfully' };
+    }
+    async resendVerificationEmail(email) {
+        const user = await this.prisma.user.findUnique({
+            where: { email },
+        });
+        if (!user) {
+            throw new common_1.BadRequestException('User not found');
+        }
+        if (user.isEmailVerified) {
+            throw new common_1.BadRequestException('Email already verified');
+        }
+        const verificationToken = (0, crypto_1.randomUUID)();
+        const verificationExpires = new Date(Date.now() + 24 * 60 * 60 * 1000);
+        await this.prisma.user.update({
+            where: { id: user.id },
+            data: {
+                emailVerificationToken: verificationToken,
+                emailVerificationExpires: verificationExpires,
+            },
+        });
+        await this.emailService.sendVerificationEmail(user.email, user.username, verificationToken);
+        return { message: 'Verification email sent' };
+    }
 };
 exports.AuthService = AuthService;
 exports.AuthService = AuthService = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [prisma_service_1.PrismaService,
-        jwt_1.JwtService])
+        jwt_1.JwtService,
+        email_service_1.EmailService])
 ], AuthService);
 //# sourceMappingURL=auth.service.js.map

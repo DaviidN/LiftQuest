@@ -19,6 +19,9 @@ export declare class UsersService {
         password: string;
         id: string;
         totalXP: number;
+        isEmailVerified: boolean;
+        emailVerificationToken: string | null;
+        emailVerificationExpires: Date | null;
         createdAt: Date;
         updatedAt: Date;
     }>;

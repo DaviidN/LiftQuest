@@ -11,6 +11,7 @@ export declare class AuthController {
             email: string;
             username: string;
             totalXP: number;
+            isEmailVerified: boolean;
         };
     }>;
     login(dto: LoginDto): Promise<{
@@ -20,6 +21,13 @@ export declare class AuthController {
             email: string;
             username: string;
             totalXP: number;
+            isEmailVerified: boolean;
         };
+    }>;
+    verifyEmail(token: string): Promise<{
+        message: string;
+    }>;
+    resendVerification(email: string): Promise<{
+        message: string;
     }>;
 }

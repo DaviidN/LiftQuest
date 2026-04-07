@@ -210,4 +210,33 @@ export const api = {
 
     return response.json();
   },
+
+  // Email verification
+  async verifyEmail(token: string): Promise<{ message: string }> {
+    const response = await fetch(`${API_URL}/auth/verify-email?token=${token}`);
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Email verification failed');
+    }
+
+    return response.json();
+  },
+
+  async resendVerificationEmail(email: string): Promise<{ message: string }> {
+    const response = await fetch(`${API_URL}/auth/resend-verification`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email }),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Failed to resend verification email');
+    }
+
+    return response.json();
+  },
 };

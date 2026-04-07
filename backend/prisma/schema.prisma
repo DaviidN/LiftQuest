@@ -12,13 +12,16 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  username  String   @unique
-  password  String
-  totalXP   Int      @default(0)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id                       String    @id @default(uuid())
+  email                    String    @unique
+  username                 String    @unique
+  password                 String
+  totalXP                  Int       @default(0)
+  isEmailVerified          Boolean   @default(false)
+  emailVerificationToken   String?
+  emailVerificationExpires DateTime?
+  createdAt                DateTime  @default(now())
+  updatedAt                DateTime  @updatedAt
 
   workouts              Workout[]
   unlockedAchievements  UserAchievement[]

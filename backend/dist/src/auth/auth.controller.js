@@ -28,6 +28,12 @@ let AuthController = class AuthController {
     login(dto) {
         return this.authService.login(dto);
     }
+    verifyEmail(token) {
+        return this.authService.verifyEmail(token);
+    }
+    resendVerification(email) {
+        return this.authService.resendVerificationEmail(email);
+    }
 };
 exports.AuthController = AuthController;
 __decorate([
@@ -44,6 +50,20 @@ __decorate([
     __metadata("design:paramtypes", [login_dto_1.LoginDto]),
     __metadata("design:returntype", void 0)
 ], AuthController.prototype, "login", null);
+__decorate([
+    (0, common_1.Get)('verify-email'),
+    __param(0, (0, common_1.Query)('token')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", void 0)
+], AuthController.prototype, "verifyEmail", null);
+__decorate([
+    (0, common_1.Post)('resend-verification'),
+    __param(0, (0, common_1.Body)('email')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", void 0)
+], AuthController.prototype, "resendVerification", null);
 exports.AuthController = AuthController = __decorate([
     (0, common_1.Controller)('auth'),
     __metadata("design:paramtypes", [auth_service_1.AuthService])

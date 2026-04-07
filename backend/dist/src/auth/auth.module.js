@@ -13,6 +13,7 @@ const passport_1 = require("@nestjs/passport");
 const auth_controller_1 = require("./auth.controller");
 const auth_service_1 = require("./auth.service");
 const jwt_strategy_1 = require("./strategies/jwt.strategy");
+const email_module_1 = require("../email/email.module");
 let AuthModule = class AuthModule {
 };
 exports.AuthModule = AuthModule;
@@ -26,6 +27,7 @@ exports.AuthModule = AuthModule = __decorate([
                     signOptions: { expiresIn: '1h' },
                 }),
             }),
+            email_module_1.EmailModule,
         ],
         controllers: [auth_controller_1.AuthController],
         providers: [auth_service_1.AuthService, jwt_strategy_1.JwtStrategy],

@@ -14,6 +14,7 @@ const auth_module_1 = require("./auth/auth.module");
 const users_module_1 = require("./users/users.module");
 const workouts_module_1 = require("./workouts/workouts.module");
 const achievements_module_1 = require("./achievements/achievements.module");
+const email_module_1 = require("./email/email.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -28,6 +29,7 @@ exports.AppModule = AppModule = __decorate([
             users_module_1.UsersModule,
             workouts_module_1.WorkoutsModule,
             achievements_module_1.AchievementsModule,
+            email_module_1.EmailModule,
         ],
     })
 ], AppModule);
