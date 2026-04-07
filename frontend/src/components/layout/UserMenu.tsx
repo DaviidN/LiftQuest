@@ -1,12 +1,13 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { LogOut } from 'lucide-react';
+import { LogOut, CheckCircle } from 'lucide-react';
 
 interface UserMenuProps {
   username: string;
+  isVerified: boolean;  
   onLogout: () => void;
 }
 
-export const UserMenu: React.FC<UserMenuProps> = ({ username, onLogout }) => {
+export const UserMenu: React.FC<UserMenuProps> = ({ username, isVerified, onLogout }) => {
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -34,7 +35,7 @@ export const UserMenu: React.FC<UserMenuProps> = ({ username, onLogout }) => {
         onClick={() => setIsOpen(!isOpen)}
         className="flex items-center gap-3 bg-slate-700 hover:bg-slate-600 px-4 py-2 rounded-lg transition-all"
       >
-        <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center font-bold">
+        <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center font-bold" >
           {username ? username.charAt(0).toUpperCase() : 'G'}
         </div>
         <span className="font-medium">{username ? username : 'Guest'}</span>
@@ -53,8 +54,15 @@ export const UserMenu: React.FC<UserMenuProps> = ({ username, onLogout }) => {
         <div className="absolute right-0 mt-2 w-56 bg-secondary border border-slate-700 rounded-lg shadow-xl overflow-hidden z-50">
           {/* User Info */}
           <div className="px-4 py-3 border-b border-slate-700">
-            <p className="text-sm font-medium">{username}</p>
-            <p className="text-xs text-gray-400 mt-1">Manage your account</p>
+            <div className='flex items-center gap-2'>
+              <CheckCircle size={18} className={`mt-[-2px] ${
+                isVerified
+                ? `text-green-500`
+                : `text-slate-500`
+              } `}/>
+              <p className="text-sm font-medium">{username}</p>
+            </div>
+            <p className="text-xs text-slate-400 mt-1">Manage your account</p>
           </div>
           {/* Logout */}
           <div className="border-t border-slate-700">

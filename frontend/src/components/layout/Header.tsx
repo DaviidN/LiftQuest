@@ -10,6 +10,7 @@ interface HeaderProps {
   logOut: () => void;
 }
 
+
 export const Header: React.FC<HeaderProps> = ({ user, onHeaderBtnClick, logOut }) => {
 
   return (
@@ -17,22 +18,12 @@ export const Header: React.FC<HeaderProps> = ({ user, onHeaderBtnClick, logOut }
       <h1 className="text-4xl font-bold bg-gradient-to-r from-heading-from to-heading-to bg-clip-text text-transparent pb-1 pr-2">
         Lift Quest
       </h1>
-      {user == null ?
-      <>
-        <Button onClick={onHeaderBtnClick} icon={LogIn}>
-          Login / Sign up
+      <div className="flex items-center justify-between gap-4">
+        <Button onClick={onHeaderBtnClick} icon={user ? Plus : LogIn}>
+          { user ? "New Workout" : "Login / Sign up"}
         </Button>
-      </>
-       : 
-      <>
-        <div className="flex items-center justify-between gap-4">
-          <Button onClick={onHeaderBtnClick} icon={Plus}>
-            New Workout
-          </Button>
-          <UserMenu username={user.username} onLogout={logOut} />
-        </div>
-      </>
-    }
+        { user && <UserMenu username={user.username} isVerified={user.isEmailVerified} onLogout={logOut} />}
+      </div>
     </div>
   );
 };

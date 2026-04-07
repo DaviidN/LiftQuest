@@ -23,5 +23,4 @@ RUN npm run build
 EXPOSE 3001
 
 # Start command (will be overridden by docker-compose)
-# CMD ["npm", "run", "start:dev"]
 CMD npx prisma migrate deploy && node dist/src/main.js

@@ -29,6 +29,7 @@ services:
       PORT: 3001
     ports:
       - "3001:3001"
+      - "51212:51212"
     depends_on:
       - postgres
     networks:
@@ -46,7 +47,7 @@ services:
     container_name: liftquest-frontend
     restart: unless-stopped
     ports:
-      - "5173:5173"
+      - "8080:8080"
     depends_on:
       - backend
     networks:

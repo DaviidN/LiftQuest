@@ -8,6 +8,7 @@ export interface Session {
     token: string;
     workouts: Workout[];
     totalXP: number;
+    isEmailVerified: boolean;
     unlockedAchievements: string[];
 }
 
@@ -57,6 +58,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             localStorage.removeItem("session");
         }
     }, [userSess]);
+
+    console.log(userSess);
 
     return (
         <AuthContext.Provider value={{ userSess, setUserSess: safeSetUserSess, isLoading }}>

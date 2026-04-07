@@ -21,7 +21,7 @@ let EmailService = class EmailService {
         this.configService = configService;
     }
     async sendVerificationEmail(email, username, token) {
-        const frontendUrl = this.configService.get('FRONTEND_URL') || 'http://localhost:5173';
+        const frontendUrl = this.configService.get('FRONTEND_URL') || 'http://localhost:8080';
         const verificationUrl = `${frontendUrl}/verify-email?token=${token}`;
         await this.mailerService.sendMail({
             to: email,

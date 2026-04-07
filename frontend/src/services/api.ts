@@ -8,6 +8,7 @@ export interface LoginResponse {
     email: string;
     username: string;
     totalXP: number;
+    isEmailVerified: boolean;
   };
 }
 
@@ -18,6 +19,7 @@ export interface SignupResponse {
     email: string;
     username: string;
     totalXP: number;
+    isEmailVerified: boolean;
   };
 }
 
@@ -27,6 +29,7 @@ export interface UserProfile {
   username: string;
   totalXP: number;
   createdAt: string;
+  isEmailVerified: boolean;
   _count: {
     workouts: number;
     unlockedAchievements: number;

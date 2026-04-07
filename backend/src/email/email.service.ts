@@ -10,7 +10,7 @@ export class EmailService {
   ) {}
 
   async sendVerificationEmail(email: string, username: string, token: string) {
-    const frontendUrl = this.configService.get('FRONTEND_URL') || 'http://localhost:5173';
+    const frontendUrl = this.configService.get('FRONTEND_URL') || 'http://localhost:8080';
     const verificationUrl = `${frontendUrl}/verify-email?token=${token}`;
 
     await this.mailerService.sendMail({

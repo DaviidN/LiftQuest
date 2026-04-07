@@ -24,6 +24,7 @@ export const useAuthActions = () => {
             token: response.token,
             workouts: workouts,
             totalXP: response.user.totalXP,
+            isEmailVerified: response.user.isEmailVerified,
             unlockedAchievements: userAchievements.map((ua: any) => ua.achievement.code),
         };
 
@@ -43,6 +44,7 @@ export const useAuthActions = () => {
             token: response.token,
             workouts: [],
             totalXP: response.user.totalXP,
+            isEmailVerified: response.user.isEmailVerified,
             unlockedAchievements: [],
         };
 
@@ -98,6 +100,7 @@ export const useAuthActions = () => {
             token: token,
             workouts: workouts,
             totalXP: profile.totalXP,
+            isEmailVerified: profile.isEmailVerified,
             unlockedAchievements: userAchievements.map((ua: any) => ua.achievement.code),
         });
     };
