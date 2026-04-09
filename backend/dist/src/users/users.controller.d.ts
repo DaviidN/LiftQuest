@@ -3,9 +3,9 @@ export declare class UsersController {
     private usersService;
     constructor(usersService: UsersService);
     getProfile(req: any): Promise<{
-        id: string;
         email: string;
         username: string;
+        id: string;
         totalXP: number;
         createdAt: Date;
         _count: {

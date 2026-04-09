@@ -14,7 +14,7 @@ type Status = 'idle' | 'loading' | 'success' | 'error';
 
 
 const FIELD_TITLES: Record<FieldVariant, string> = {
-    email: 'Update Email',
+    email: 'Email Update',
     username: 'Change Username',
     password: 'Change Password',
 };
@@ -193,9 +193,9 @@ export const UpdateUser = () => {
                                 </div>
                             </div>
 
-                            {field === 'password' || field === 'email' && (
+                            {(field === 'password' || field === 'email') && (
                                 <div className="flex flex-col gap-1">
-                                    <label className="text-sm text-slate-400">{field === 'email' ? "Password" : "Confirm New Password"}</label>
+                                    <label className="text-sm text-slate-400">{field === 'email' ? "Password for confirmation " : "Confirm New Password"}</label>
                                     <div className="relative">
                                         <Lock className="absolute left-2 top-1/2 -translate-y-1/2 w-7 h-7 p-1 rounded-xl text-slate-400"/>
                                         <Input

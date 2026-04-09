@@ -170,7 +170,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                   variant="ghost"
                   size="sm"
                   onClick={() => setShowPassword((p) => !p)}
-                  className="absolute right-1 top-1/2 -translate-y-1/2 !p-1 bg-transparent"
+                  className="absolute right-1 top-1/2 -translate-y-1/2 !p-1 bg-transparent text-slate-900"
               >
                   {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
               </Button>
