@@ -3,9 +3,9 @@ export declare class UsersController {
     private usersService;
     constructor(usersService: UsersService);
     getProfile(req: any): Promise<{
+        id: string;
         email: string;
         username: string;
-        id: string;
         totalXP: number;
         createdAt: Date;
         _count: {
@@ -40,14 +40,9 @@ export declare class UsersController {
         };
     }>;
     updatePassword(req: any, currentPassword: string, newPassword: string): Promise<{
-        token: string;
-        user: {
-            id: string;
-            email: string;
-            username: string;
-            totalXP: number;
-            isEmailVerified: boolean;
-        };
+        message: string;
     }>;
-    deleteProfile(req: any): Promise<void>;
+    deleteProfile(req: any): Promise<{
+        message: string;
+    }>;
 }

@@ -1,4 +1,4 @@
-import { Injectable, ConflictException, UnauthorizedException } from '@nestjs/common';
+import { Injectable, ConflictException, UnauthorizedException, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
@@ -96,7 +96,7 @@ export class UsersService {
     });
 
     if (!user) {
-      throw new ConflictException('User does not exist');
+      throw new NotFoundException('User does not exist');
     }
 
     const isCurrentPasswordCorrect = await bcrypt.compare(currentPassword, user.password);
@@ -156,7 +156,7 @@ export class UsersService {
     });
 
     if (!user) {
-      throw new ConflictException('User does not exist');
+      throw new NotFoundException('User does not exist');
     }
 
     if(user.username === updatedUsername){
@@ -194,7 +194,7 @@ export class UsersService {
     });
 
     if (!user) {
-      throw new ConflictException('User does not exist');
+      throw new NotFoundException('User does not exist');
     }
 
     const isCurrentPasswordCorrect = await bcrypt.compare(currentPassword, user.password);
@@ -203,38 +203,20 @@ export class UsersService {
       throw new UnauthorizedException('Incorrect password')
     }
 
-    const isPasswordValid = await bcrypt.compare(newPassword, user.password);
+    const isSamePassword = await bcrypt.compare(newPassword, user.password);
 
-    if (!isPasswordValid) {
-      throw new UnauthorizedException('New password must be different');
+    if (isSamePassword) {
+      throw new ConflictException('New password must be different');
     }
 
-    // Hash password
     const hashedPassword = await bcrypt.hash(newPassword, 10);
 
-    const updatedUser = await this.prisma.user.update({
+    await this.prisma.user.update({
       where: {id: userId},
-      data:{
-        password: hashedPassword,
-      }
-    })
-
-    // Generate JWT
-    const token = this.jwtService.sign({
-      sub: user.id,
-      email: user.email,
+      data:{ password: hashedPassword }
     });
 
-    return {
-      token,
-      user: {
-        id: updatedUser.id,
-        email: updatedUser.email,
-        username: updatedUser.username,
-        totalXP: updatedUser.totalXP,
-        isEmailVerified: updatedUser.isEmailVerified,
-      },
-    };
+    return { message: 'Password updated successfully' };
   }
 
   async deleteProfile(userId: string){
@@ -243,7 +225,13 @@ export class UsersService {
     });
 
     if (!existingUser) {
-      throw new ConflictException('User does not exist');
+      throw new NotFoundException('User does not exist');
     }
+
+    await this.prisma.user.delete({
+      where: { id: userId },
+    });
+
+    return { message: 'Account deleted successfully' };
   }
 }

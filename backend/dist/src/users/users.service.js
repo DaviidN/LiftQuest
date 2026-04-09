@@ -129,7 +129,7 @@ let UsersService = class UsersService {
             where: { id: userId },
         });
         if (!user) {
-            throw new common_1.ConflictException('User does not exist');
+            throw new common_1.NotFoundException('User does not exist');
         }
         const isCurrentPasswordCorrect = await bcrypt.compare(currentPassword, user.password);
         if (!isCurrentPasswordCorrect) {
@@ -170,7 +170,7 @@ let UsersService = class UsersService {
             where: { id: userId },
         });
         if (!user) {
-            throw new common_1.ConflictException('User does not exist');
+            throw new common_1.NotFoundException('User does not exist');
         }
         if (user.username === updatedUsername) {
             throw new common_1.ConflictException('New username must be different');
@@ -201,45 +201,34 @@ let UsersService = class UsersService {
             where: { id: userId },
         });
         if (!user) {
-            throw new common_1.ConflictException('User does not exist');
+            throw new common_1.NotFoundException('User does not exist');
         }
         const isCurrentPasswordCorrect = await bcrypt.compare(currentPassword, user.password);
         if (!isCurrentPasswordCorrect) {
             throw new common_1.UnauthorizedException('Incorrect password');
         }
-        const isPasswordValid = await bcrypt.compare(newPassword, user.password);
-        if (!isPasswordValid) {
-            throw new common_1.UnauthorizedException('New password must be different');
+        const isSamePassword = await bcrypt.compare(newPassword, user.password);
+        if (isSamePassword) {
+            throw new common_1.ConflictException('New password must be different');
         }
         const hashedPassword = await bcrypt.hash(newPassword, 10);
-        const updatedUser = await this.prisma.user.update({
+        await this.prisma.user.update({
             where: { id: userId },
-            data: {
-                password: hashedPassword,
-            }
+            data: { password: hashedPassword }
         });
-        const token = this.jwtService.sign({
-            sub: user.id,
-            email: user.email,
-        });
-        return {
-            token,
-            user: {
-                id: updatedUser.id,
-                email: updatedUser.email,
-                username: updatedUser.username,
-                totalXP: updatedUser.totalXP,
-                isEmailVerified: updatedUser.isEmailVerified,
-            },
-        };
+        return { message: 'Password updated successfully' };
     }
     async deleteProfile(userId) {
         const existingUser = await this.prisma.user.findFirst({
             where: { id: userId },
         });
         if (!existingUser) {
-            throw new common_1.ConflictException('User does not exist');
+            throw new common_1.NotFoundException('User does not exist');
         }
+        await this.prisma.user.delete({
+            where: { id: userId },
+        });
+        return { message: 'Account deleted successfully' };
     }
 };
 exports.UsersService = UsersService;
