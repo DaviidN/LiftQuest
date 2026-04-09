@@ -163,6 +163,14 @@ export class UsersService {
       throw new ConflictException('New username must be different')
     }
 
+    const isUsernameUsed = await this.prisma.user.findFirst({
+      where: {username: updatedUsername}
+    })
+
+    if(isUsernameUsed){
+      throw new ConflictException('Username already in use')
+    }
+
     const updatedUser = await this.prisma.user.update({
       where: {id: userId},
       data:{
