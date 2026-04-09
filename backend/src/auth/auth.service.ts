@@ -53,6 +53,7 @@ export class AuthService {
       user.email,
       user.username,
       verificationToken,
+      'signup',
     );
 
     // Generate JWT
@@ -141,7 +142,7 @@ export class AuthService {
       throw new BadRequestException('Verification token has expired');
     }
 
-    await this.prisma.user.update({
+    const updatedUser = await this.prisma.user.update({
       where: { id: user.id },
       data: {
         isEmailVerified: true,
@@ -150,7 +151,22 @@ export class AuthService {
       },
     });
 
-    return { message: 'Email verified successfully' };
+    const authToken = this.jwtService.sign({
+      sub: updatedUser.id,
+      email: updatedUser.email,
+    });
+
+    return {
+      message: 'Email verified successfully',
+      token: authToken,
+      user: {
+        id: updatedUser.id,
+        email: updatedUser.email,
+        username: updatedUser.username,
+        totalXP: updatedUser.totalXP,
+        isEmailVerified: updatedUser.isEmailVerified,
+      },
+    };
   }
 
   async resendVerificationEmail(email: string) {
@@ -181,6 +197,7 @@ export class AuthService {
       user.email,
       user.username,
       verificationToken,
+      'signup',
     );
 
     return { message: 'Verification email sent' };

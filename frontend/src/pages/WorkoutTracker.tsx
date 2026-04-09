@@ -15,7 +15,8 @@ import { WorkoutList } from '../components/workouts/WorkoutList';
 import { AddWorkoutModal } from '../components/workouts/AddWorkoutModal';
 import { AchievementGrid } from '../components/achievements/AchievementGrid';
 import { AchievementNotification } from '../components/common/AchievementNotification';
-import { AuthModal } from '../components/auth/AuthModal';
+import { AuthModal } from '../components/user/AuthModal';
+import { SettingsModal } from '../components/user/SettingsModal';
 
 import { useAuthActions } from '../hooks/userAuthActions';
 
@@ -23,11 +24,12 @@ export const WorkoutTracker = () => {
   const [achievements, setAchievements] = useState<any[]>([]);
   const [showAddWorkout, setShowAddWorkout] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const [showAccountModal, setShowAccountModal] = useState(false);
   const [activeTab, setActiveTab] = useState('dashboard');
   const [newAchievement, setNewAchievement] = useState<string | null>(null);
 
   const { userSess, isLoading } = useAuth();
-  const { logout, addWorkout } = useAuthActions();
+  const { addWorkout } = useAuthActions();
 
   // Load achievements on mount if user is logged in
   useEffect(() => {
@@ -128,8 +130,7 @@ export const WorkoutTracker = () => {
       <div className="w-full mb-6 p-2">
         <Header
           onHeaderBtnClick={userSess ? () => setShowAddWorkout(true) : () => setShowAuthModal(true)}
-          logOut={logout}
-          user={userSess}
+          showAccount={() => setShowAccountModal(true)}
         />
       </div>
 
@@ -187,9 +188,16 @@ export const WorkoutTracker = () => {
           onAdd={handleAddWorkout}
         />
       )}
+      {/* Auth Modal */}
       {showAuthModal && (
         <AuthModal
           onClose={() => setShowAuthModal(false)}
+        />
+      )}
+      {/* User Settings Modal */}
+      {showAccountModal && (
+        <SettingsModal
+          onClose={() => setShowAccountModal(false)}
         />
       )}
     </div>

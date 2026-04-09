@@ -9,13 +9,25 @@ export class EmailService {
     private configService: ConfigService,
   ) {}
 
-  async sendVerificationEmail(email: string, username: string, token: string) {
+  async sendVerificationEmail(email: string, username: string, token: string, context: 'signup' | 'email-update' = 'signup') {
     const frontendUrl = this.configService.get('FRONTEND_URL') || 'http://localhost:8080';
     const verificationUrl = `${frontendUrl}/verify-email?token=${token}`;
 
+    const isUpdate = context === 'email-update';
+
+    const subject = isUpdate ? 'Confirm your new LiftQuest email' : 'Verify your LiftQuest account';
+    const heading = isUpdate ? 'Email Change Request' : 'Welcome to LiftQuest!';
+    const bodyText = isUpdate
+      ? 'You recently requested to change your email address. Please verify your new email to apply the change.'
+      : 'Thanks for signing up! Please verify your email address to start tracking your fitness journey.';
+    const buttonLabel = isUpdate ? 'Confirm New Email' : 'Verify Email';
+    const footerNote = isUpdate
+      ? "If you didn't request an email change, you can safely ignore this email. Your account remains unchanged."
+      : "If you didn't create an account with LiftQuest, you can safely ignore this email.";
+
     await this.mailerService.sendMail({
       to: email,
-      subject: 'Verify your LiftQuest account',
+      subject,
       html: `
         <!DOCTYPE html>
         <html>
@@ -25,13 +37,13 @@ export class EmailService {
         </head>
         <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
           <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; text-align: center; border-radius: 10px 10px 0 0;">
-            <h1 style="color: white; margin: 0;">Welcome to LiftQuest!</h1>
+            <h1 style="color: white; margin: 0;">${heading}</h1>
           </div>
 
           <div style="background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px;">
             <p>Hey <strong>${username}</strong>,</p>
 
-            <p>Thanks for signing up! Please verify your email address to start tracking your fitness journey.</p>
+            <p>${bodyText}</p>
 
             <div style="text-align: center; margin: 30px 0;">
               <a href="${verificationUrl}"
@@ -42,7 +54,7 @@ export class EmailService {
                         border-radius: 5px;
                         font-weight: bold;
                         display: inline-block;">
-                Verify Email
+                ${buttonLabel}
               </a>
             </div>
 
@@ -58,7 +70,7 @@ export class EmailService {
             <hr style="border: none; border-top: 1px solid #ddd; margin: 20px 0;">
 
             <p style="color: #999; font-size: 12px; text-align: center;">
-              If you didn't create an account with LiftQuest, you can safely ignore this email.
+              ${footerNote}
             </p>
           </div>
         </body>

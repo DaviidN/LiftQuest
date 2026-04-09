@@ -59,8 +59,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         }
     }, [userSess]);
 
-    console.log(userSess);
-
     return (
         <AuthContext.Provider value={{ userSess, setUserSess: safeSetUserSess, isLoading }}>
             {children}

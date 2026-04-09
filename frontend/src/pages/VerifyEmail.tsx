@@ -3,6 +3,7 @@ import { useSearch, useLocation } from 'wouter';
 import { CheckCircle, XCircle, Loader2 } from 'lucide-react';
 import { api } from '../services/api';
 import { Button } from '../components/UI/Button';
+import { useAuth } from '../context/userSessContext';
 
 type VerificationStatus = 'loading' | 'success' | 'error';
 
@@ -11,6 +12,7 @@ export const VerifyEmail = () => {
   const [message, setMessage] = useState('');
   const [, setLocation] = useLocation();
   const searchString = useSearch();
+  const { userSess, setUserSess } = useAuth();
 
   useEffect(() => {
     const verifyToken = async () => {
@@ -25,6 +27,18 @@ export const VerifyEmail = () => {
 
       try {
         const response = await api.verifyEmail(token);
+        if (response.token && response.user) {
+          localStorage.setItem('authToken', response.token);
+          
+          const storedSession = localStorage.getItem('session');
+          const existingSession = storedSession ? JSON.parse(storedSession) : userSess;
+          if (existingSession) {
+            const updatedSession = { ...existingSession, email: response.user.email, isEmailVerified: response.user.isEmailVerified };
+            localStorage.setItem('session', JSON.stringify(updatedSession));
+            setUserSess(updatedSession);
+          }
+        }
+        console.log(response)
         setStatus('success');
         setMessage(response.message);
       } catch (err: any) {

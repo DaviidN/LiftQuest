@@ -82,7 +82,7 @@ let AuthService = class AuthService {
                 emailVerificationExpires: verificationExpires,
             },
         });
-        await this.emailService.sendVerificationEmail(user.email, user.username, verificationToken);
+        await this.emailService.sendVerificationEmail(user.email, user.username, verificationToken, 'signup');
         const token = this.jwtService.sign({
             sub: user.id,
             email: user.email,
@@ -152,7 +152,7 @@ let AuthService = class AuthService {
         if (user.emailVerificationExpires && user.emailVerificationExpires < new Date()) {
             throw new common_1.BadRequestException('Verification token has expired');
         }
-        await this.prisma.user.update({
+        const updatedUser = await this.prisma.user.update({
             where: { id: user.id },
             data: {
                 isEmailVerified: true,
@@ -160,7 +160,21 @@ let AuthService = class AuthService {
                 emailVerificationExpires: null,
             },
         });
-        return { message: 'Email verified successfully' };
+        const authToken = this.jwtService.sign({
+            sub: updatedUser.id,
+            email: updatedUser.email,
+        });
+        return {
+            message: 'Email verified successfully',
+            token: authToken,
+            user: {
+                id: updatedUser.id,
+                email: updatedUser.email,
+                username: updatedUser.username,
+                totalXP: updatedUser.totalXP,
+                isEmailVerified: updatedUser.isEmailVerified,
+            },
+        };
     }
     async resendVerificationEmail(email) {
         const user = await this.prisma.user.findUnique({
@@ -181,7 +195,7 @@ let AuthService = class AuthService {
                 emailVerificationExpires: verificationExpires,
             },
         });
-        await this.emailService.sendVerificationEmail(user.email, user.username, verificationToken);
+        await this.emailService.sendVerificationEmail(user.email, user.username, verificationToken, 'signup');
         return { message: 'Verification email sent' };
     }
 };

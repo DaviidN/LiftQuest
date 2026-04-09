@@ -26,6 +26,14 @@ export declare class AuthController {
     }>;
     verifyEmail(token: string): Promise<{
         message: string;
+        token: string;
+        user: {
+            id: string;
+            email: string;
+            username: string;
+            totalXP: number;
+            isEmailVerified: boolean;
+        };
     }>;
     resendVerification(email: string): Promise<{
         message: string;

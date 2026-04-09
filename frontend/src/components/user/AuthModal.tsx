@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { X, Mail, Lock, User } from "lucide-react";
+import { X, Mail, Lock, User, Eye, EyeOff } from "lucide-react";
 import { Button } from "../UI/Button";
 import { Input } from "../UI/Input";
 import { useAuthActions } from "../../hooks/userAuthActions";
@@ -17,7 +17,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   const [password, setPassword] = useState("");
   const [username, setUsername] = useState("");
   const [loading, setLoading] = useState(false);
-  const [passVis, setPassVis] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [touched, setTouched] = useState({
     email: false,
@@ -148,14 +148,14 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-2 text-gray-300">
+            <label className="block text-sm font-medium mb-2 text-slate-300">
               Password
             </label>
             <div className="relative">
-              <Lock className="absolute left-2 top-1/2 -translate-y-1/2 w-7 h-7 p-1 rounded-xl text-gray-400 hover:cursor-pointer hover:text-gray-300 hover:bg-slate-800" onClick={() => setPassVis(!passVis)}/>
+              <Lock className="absolute left-2 top-1/2 -translate-y-1/2 w-7 h-7 p-1 rounded-xl text-slate-400"/>
               <Input
                 auth
-                type={ passVis ? "text" : "password"}
+                type={ showPassword ? "text" : "password"}
                 placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -165,6 +165,15 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                     : 'focus:ring-purple-500'
                 }`}
               />
+              <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowPassword((p) => !p)}
+                  className="absolute right-1 top-1/2 -translate-y-1/2 !p-1 bg-transparent"
+              >
+                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+              </Button>
             </div>
             {touched.password && !password && (
               <p className="text-red-400 text-sm mt-1">Password is required</p>

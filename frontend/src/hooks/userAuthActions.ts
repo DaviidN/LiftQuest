@@ -83,33 +83,10 @@ export const useAuthActions = () => {
         return { newWorkout, unlockedAchievements };
     };
 
-    const refreshSession = async () => {
-        const token = localStorage.getItem('authToken');
-        if (!token) return;
-
-        const [profile, workouts, userAchievements] = await Promise.all([
-            api.getProfile(),
-            api.getWorkouts(),
-            api.getUserAchievements(),
-        ]);
-
-        setUserSess({
-            id: profile.id,
-            email: profile.email,
-            username: profile.username,
-            token: token,
-            workouts: workouts,
-            totalXP: profile.totalXP,
-            isEmailVerified: profile.isEmailVerified,
-            unlockedAchievements: userAchievements.map((ua: any) => ua.achievement.code),
-        });
-    };
-
     return {
         login,
         signup,
         logout,
-        addWorkout,
-        refreshSession,
+        addWorkout
     };
 };

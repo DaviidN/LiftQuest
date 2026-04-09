@@ -27,6 +27,18 @@ let UsersController = class UsersController {
     getStats(req) {
         return this.usersService.getStats(req.user.id);
     }
+    updateEmail(req, email, currentPassword) {
+        return this.usersService.updateEmail(req.user.id, email, currentPassword);
+    }
+    updateUsername(req, username) {
+        return this.usersService.updateUsername(req.user.id, username);
+    }
+    async updatePassword(req, currentPassword, newPassword) {
+        return this.usersService.updatePassword(req.user.id, currentPassword, newPassword);
+    }
+    deleteProfile(req) {
+        return this.usersService.deleteProfile(req.user.id);
+    }
 };
 exports.UsersController = UsersController;
 __decorate([
@@ -43,6 +55,39 @@ __decorate([
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", void 0)
 ], UsersController.prototype, "getStats", null);
+__decorate([
+    (0, common_1.Put)('email'),
+    __param(0, (0, common_1.Request)()),
+    __param(1, (0, common_1.Body)('email')),
+    __param(2, (0, common_1.Body)('currentPassword')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, String, String]),
+    __metadata("design:returntype", void 0)
+], UsersController.prototype, "updateEmail", null);
+__decorate([
+    (0, common_1.Put)('username'),
+    __param(0, (0, common_1.Request)()),
+    __param(1, (0, common_1.Body)('username')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, String]),
+    __metadata("design:returntype", void 0)
+], UsersController.prototype, "updateUsername", null);
+__decorate([
+    (0, common_1.Put)('password'),
+    __param(0, (0, common_1.Request)()),
+    __param(1, (0, common_1.Body)('currentPassword')),
+    __param(2, (0, common_1.Body)('newPassword')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, String, String]),
+    __metadata("design:returntype", Promise)
+], UsersController.prototype, "updatePassword", null);
+__decorate([
+    (0, common_1.Delete)('delete'),
+    __param(0, (0, common_1.Request)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", void 0)
+], UsersController.prototype, "deleteProfile", null);
 exports.UsersController = UsersController = __decorate([
     (0, common_1.Controller)('users'),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),

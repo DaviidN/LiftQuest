@@ -54,6 +54,14 @@ export declare class AuthService {
     } | null>;
     verifyEmail(token: string): Promise<{
         message: string;
+        token: string;
+        user: {
+            id: string;
+            email: string;
+            username: string;
+            totalXP: number;
+            isEmailVerified: boolean;
+        };
     }>;
     resendVerificationEmail(email: string): Promise<{
         message: string;

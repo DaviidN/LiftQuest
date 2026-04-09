@@ -1,7 +1,11 @@
 import { PrismaService } from 'prisma/prisma.service';
+import { JwtService } from '@nestjs/jwt';
+import { EmailService } from '../email/email.service';
 export declare class UsersService {
     private prisma;
-    constructor(prisma: PrismaService);
+    private jwtService;
+    private emailService;
+    constructor(prisma: PrismaService, jwtService: JwtService, emailService: EmailService);
     getProfile(userId: string): Promise<{
         email: string;
         username: string;
@@ -31,4 +35,35 @@ export declare class UsersService {
         airbikeWorkouts: number;
         currentStreak: number;
     }>;
+    updateEmail(userId: string, updatedEmail: string, currentPassword: string): Promise<{
+        token: string;
+        user: {
+            id: string;
+            email: string;
+            username: string;
+            totalXP: number;
+            isEmailVerified: boolean;
+        };
+    }>;
+    updateUsername(userId: string, updatedUsername: string): Promise<{
+        token: string;
+        user: {
+            id: string;
+            email: string;
+            username: string;
+            totalXP: number;
+            isEmailVerified: boolean;
+        };
+    }>;
+    updatePassword(userId: string, currentPassword: string, newPassword: string): Promise<{
+        token: string;
+        user: {
+            id: string;
+            email: string;
+            username: string;
+            totalXP: number;
+            isEmailVerified: boolean;
+        };
+    }>;
+    deleteProfile(userId: string): Promise<void>;
 }

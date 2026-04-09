@@ -6,6 +6,7 @@ type ButtonSize = 'sm' | 'md' | 'lg';
 
 interface ButtonProps {
   children: React.ReactNode;
+  menu?: boolean;
   onClick?: () => void;
   variant?: ButtonVariant;
   size?: ButtonSize;
@@ -19,6 +20,7 @@ interface ButtonProps {
 export const Button: React.FC<ButtonProps> = ({
   children,
   onClick,
+  menu = false,
   variant = 'primary',
   size = 'md',
   icon: Icon,
@@ -29,14 +31,14 @@ export const Button: React.FC<ButtonProps> = ({
 }) => {
 
   // Base styles
-  const baseStyles = 'rounded-lg font-medium transition-all flex items-center justify-center gap-2';
+  const baseStyles = `rounded-lg font-medium transition-all flex items-center gap-2 focus:outline-none ${menu ? "justify-start" : "justify-center"}`;
 
   // Variant styles
   const variantStyles = {
     primary: 'bg-gradient-to-r from-btnPrimary-from to-btnPrimary-to hover:from-btnPrimaryHover-from hover:to-btnPrimaryHover-to text-white border-none',
     secondary: 'bg-btnSecondary hover:bg-btnSecondaryHover border-purple-500/30 hover:border-purple-500/50 text-purple-200',
     tertiary: 'bg-btnTertiary hover:bg-btnTertiaryHover border-slate-500 hover:border-slate-400',
-    ghost: 'border-none',
+    ghost: 'border-none hover:bg-btnGhostHover',
   };
 
   // Size styles

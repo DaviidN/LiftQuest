@@ -107,6 +107,79 @@ export const api = {
     return response.json();
   },
 
+    async deleteProfile(userId: string) {
+    const token = getAuthToken();
+    const response = await fetch(`${API_URL}/users/delete/${userId}`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to delete profile');
+    }
+
+    return response.json();
+  },
+
+    async updateEmail(currentPassword: string,email: string) {
+    const token = getAuthToken();
+    const response = await fetch(`${API_URL}/users/email`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify({ email, currentPassword }),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Failed to update email');
+    }
+
+    return response.json();
+  },
+
+  async updateUsername(username: string) {
+    const token = getAuthToken();
+    const response = await fetch(`${API_URL}/users/username`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify({ username }),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Failed to change username');
+    }
+
+    return response.json();
+  },
+
+  async updatePassword(currentPassword: string, newPassword: string) {
+    const token = getAuthToken();
+    const response = await fetch(`${API_URL}/users/password`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify({ currentPassword, newPassword }),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Failed to update password');
+    }
+
+    return response.json();
+  },
+
   // Workouts
   async getWorkouts() {
     const token = getAuthToken();
@@ -215,7 +288,7 @@ export const api = {
   },
 
   // Email verification
-  async verifyEmail(token: string): Promise<{ message: string }> {
+  async verifyEmail(token: string): Promise<{ message: string; token?: string; user?: { id: string; email: string; username: string; totalXP: number; isEmailVerified: boolean } }> {
     const response = await fetch(`${API_URL}/auth/verify-email?token=${token}`);
 
     if (!response.ok) {

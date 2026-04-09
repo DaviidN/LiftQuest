@@ -31,8 +31,11 @@ export default {
 
         btnSecondary: "var(--btn-color-secondary)",
         btnSecondaryHover: "var(--btn-color-secondary-hover)",
+
         btnTertiary: "var(--btn-color-tertiary)",
         btnTertiaryHover: "var(--btn-color-tertiary-hover)",
+        
+        btnGhostHover: "var(--btn-color-ghost-hover)"
       },
     },
   },

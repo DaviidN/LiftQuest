@@ -19,4 +19,35 @@ export declare class UsersController {
         airbikeWorkouts: number;
         currentStreak: number;
     }>;
+    updateEmail(req: any, email: string, currentPassword: string): Promise<{
+        token: string;
+        user: {
+            id: string;
+            email: string;
+            username: string;
+            totalXP: number;
+            isEmailVerified: boolean;
+        };
+    }>;
+    updateUsername(req: any, username: string): Promise<{
+        token: string;
+        user: {
+            id: string;
+            email: string;
+            username: string;
+            totalXP: number;
+            isEmailVerified: boolean;
+        };
+    }>;
+    updatePassword(req: any, currentPassword: string, newPassword: string): Promise<{
+        token: string;
+        user: {
+            id: string;
+            email: string;
+            username: string;
+            totalXP: number;
+            isEmailVerified: boolean;
+        };
+    }>;
+    deleteProfile(req: any): Promise<void>;
 }

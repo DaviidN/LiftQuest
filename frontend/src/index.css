@@ -40,7 +40,10 @@
 
   /* BUTTON TERTIARY */
   --btn-color-tertiary: #64748b66;  
-  --btn-color-tertiary-hover: #64748b80;          
+  --btn-color-tertiary-hover: #64748b80;    
+  
+  /* BUTTON GHOST */
+  --btn-color-ghost-hover: #64748b;
 }
 
 a {
