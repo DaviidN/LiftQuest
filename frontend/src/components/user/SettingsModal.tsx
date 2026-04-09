@@ -3,6 +3,7 @@ import { X, Mail, User, Trash2, Lock } from "lucide-react";
 import { Button } from "../UI/Button";
 import { useAuth } from "../../context/userSessContext";
 import { useLocation } from "wouter";
+import { api } from "../../services/api";
 
 interface SettingsModalProps {
   onClose: () => void;
@@ -14,7 +15,20 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
     
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
     const [, setLocation] = useLocation();
-    const { userSess } = useAuth();
+    const { userSess, setUserSess } = useAuth();
+
+    const handleDeleteProfile = async () =>{
+        try{
+            await api.deleteProfile();
+            localStorage.removeItem('authToken');
+            localStorage.removeItem('session');
+            setUserSess(undefined);
+            setLocation('/');
+            onClose();
+        } catch(err: any) {
+            console.error('Failed to delete account:', err); 
+        }
+    }
 
     return (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
@@ -110,7 +124,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                             <Button 
                                 variant="ghost" 
                                 className="text-red-500 hover:bg-red-500/20"
-                                onClick={() => setShowDeleteConfirm(true)}
+                                onClick={() => handleDeleteProfile()}
                             >
                                 <Trash2 size={18}/>
                                 Delete Forever

@@ -107,9 +107,9 @@ export const api = {
     return response.json();
   },
 
-    async deleteProfile(userId: string) {
+    async deleteProfile() {
     const token = getAuthToken();
-    const response = await fetch(`${API_URL}/users/delete/${userId}`, {
+    const response = await fetch(`${API_URL}/users/delete`, {
       method: 'DELETE',
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -119,7 +119,7 @@ export const api = {
     if (!response.ok) {
       throw new Error('Failed to delete profile');
     }
-
+      
     return response.json();
   },
 
