@@ -7,7 +7,7 @@ import { Button } from '../components/UI/Button';
 import { Input } from '../components/UI/Input';
 import { useAuth } from '../context/userSessContext';
 
-type FieldVariant = 'email' | 'username' | 'password';
+type FieldVariant = 'email' | 'username' | 'password' | 'request' | 'password_reset';
 
 type Status = 'idle' | 'loading' | 'success' | 'error';
 
@@ -17,18 +17,24 @@ const FIELD_TITLES: Record<FieldVariant, string> = {
     email: 'Email Update',
     username: 'Change Username',
     password: 'Change Password',
+    request: 'Request Password Change',
+    password_reset: 'Password Reset'
 };
 
 const FIELD_LABELS: Record<FieldVariant, string> = {
     email: 'New Email',
     username: 'New Username',
     password: 'New Password',
+    request: 'Your Email',
+    password_reset: 'New Password'
 };
 
 const ICONS: Record<string, LucideIcon> = {
     email: Mail,
     username: User,
-    password: Lock
+    password: Lock, 
+    request: Mail,
+    password_reset: Lock
 }
 
 export const UpdateUser = () => {
@@ -37,6 +43,7 @@ export const UpdateUser = () => {
     const { userSess, setUserSess } = useAuth();
 
     const [field, setField] = useState<FieldVariant | null>(null);
+    const [token, setToken] = useState<string | null>(null);
     const [value, setValue] = useState('');
     const [currentPassword, setCurrentPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
@@ -49,8 +56,9 @@ export const UpdateUser = () => {
 
     useEffect(() => {
         const params = new URLSearchParams(searchString);
+        setToken(params.get('token'));
         const f = params.get('field');                                                                             
-        const validFields: FieldVariant[] = ['email', 'username', 'password'];                                     
+        const validFields: FieldVariant[] = ['email', 'username', 'password', 'request', 'password_reset'];                                     
         setField(validFields.includes(f as FieldVariant) ? (f as FieldVariant) : null);  
     }, [searchString]);
 
@@ -58,7 +66,7 @@ export const UpdateUser = () => {
         e.preventDefault();
         if (!field) return;
 
-        if (field === 'password' && value !== confirmPassword) {
+        if ((field === 'password' || field === 'password_reset') && value !== confirmPassword) {
             setStatus('error');
             setErrorMessage('Passwords do not match.');
             return;
@@ -81,6 +89,11 @@ export const UpdateUser = () => {
                 }
             } else if (field === 'password') {
                 await api.updatePassword(currentPassword, value);
+            } else if (field === 'request'){
+                await api.requestEmail(value);
+            } else if (field === 'password_reset'){
+                if(token) 
+                await api.resetPassword(value, token);
             }
             setStatus('success');
         } catch (err: any) {
@@ -89,7 +102,7 @@ export const UpdateUser = () => {
         }
     };
 
-    if (!field) {
+    if ((!field || field === 'password_reset' && !token)) {
         return (
             <div className="min-h-screen w-screen bg-gradient-to-br from-primary-from via-primary-via to-primary-to flex items-center justify-center text-white p-4">
                 <div className="relative flex flex-col text-center max-w-md">
@@ -133,7 +146,8 @@ export const UpdateUser = () => {
                             <p className="text-lg font-semibold text-white">
                                 {field === 'email' && 'Email updated successfully!'}
                                 {field === 'username' && 'Username changed successfully!'}
-                                {field === 'password' && 'Password changed successfully!'}
+                                {(field === 'password' || field === 'password_reset') && 'Password changed successfully!'}
+                                {field === 'request' && 'If an account exists for this email, you will receive a reset link shortly!'}
                             </p>
                             <Button onClick={() => setLocation('/')} variant="primary" size="sm">
                                 Back to dashboard
@@ -159,7 +173,7 @@ export const UpdateUser = () => {
                                             variant="ghost"
                                             size="sm"
                                             onClick={() => setShowCurrentPassword((p) => !p)}
-                                            className="absolute right-1 top-1/2 -translate-y-1/2 !p-1"
+                                            className="absolute right-1 top-1/2 -translate-y-1/2 !p-1 text-slate-400"
                                         >
                                             {showCurrentPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                                         </Button>
@@ -172,20 +186,20 @@ export const UpdateUser = () => {
                                 <div className="relative">
                                     <IconComponent className="absolute left-2 top-1/2 -translate-y-1/2 w-7 h-7 p-1 rounded-xl text-slate-400"/>
                                     <Input
-                                        type={field === 'password' ? (showPassword ? 'text' : 'password') : field === 'email' ? 'email' : 'text'}
+                                        type={(field === 'password' || field === 'password_reset') ? (showPassword ? 'text' : 'password') : (field === 'email' || field === 'request') ? 'email' : 'text'}
                                         value={value}
                                         onChange={(e) => setValue(e.target.value)}
-                                        placeholder={field === 'email' ? 'Enter new email' : field === 'username' ? 'Enter new username' : 'Enter new password'}
+                                        placeholder={field === 'email' ? 'Enter new email' : field === 'username' ? 'Enter new username' : field === 'request' ? 'Enter your email' : 'Enter new password'}
                                         auth
                                         className="pl-11"
                                     />
-                                    {field === 'password' && (
+                                    {(field === 'password' || field === 'password_reset') && (
                                         <Button
                                             type="button"
                                             variant="ghost"
                                             size="sm"
                                             onClick={() => setShowPassword((p) => !p)}
-                                            className="absolute right-1 top-1/2 -translate-y-1/2 !p-1"
+                                            className="absolute right-1 top-1/2 -translate-y-1/2 !p-1 text-slate-400"
                                         >
                                             {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                                         </Button>
@@ -193,7 +207,7 @@ export const UpdateUser = () => {
                                 </div>
                             </div>
 
-                            {(field === 'password' || field === 'email') && (
+                            {(field === 'password' || field === 'email' || field === 'password_reset') && (
                                 <div className="flex flex-col gap-1">
                                     <label className="text-sm text-slate-400">{field === 'email' ? "Password for confirmation " : "Confirm New Password"}</label>
                                     <div className="relative">
@@ -226,10 +240,10 @@ export const UpdateUser = () => {
                                 {status === 'loading' ? (
                                     <>
                                         <Loader2 className="w-4 h-4 animate-spin" />
-                                        Saving...
+                                            {field === 'request' ? "Sending..." : "Saving..."}
                                     </>
                                 ) : (
-                                    'Save Changes'
+                                    field === 'request' ? "Send email" : "Save changes"
                                 )}
                             </Button>
                         </form>

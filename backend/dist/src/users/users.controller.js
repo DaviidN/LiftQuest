@@ -21,6 +21,12 @@ let UsersController = class UsersController {
     constructor(usersService) {
         this.usersService = usersService;
     }
+    requestEmail(email) {
+        return this.usersService.requestEmail(email);
+    }
+    resetPassword(token, newPassword) {
+        return this.usersService.resetPassword(token, newPassword);
+    }
     getProfile(req) {
         return this.usersService.getProfile(req.user.id);
     }
@@ -33,7 +39,7 @@ let UsersController = class UsersController {
     updateUsername(req, username) {
         return this.usersService.updateUsername(req.user.id, username);
     }
-    async updatePassword(req, currentPassword, newPassword) {
+    updatePassword(req, currentPassword, newPassword) {
         return this.usersService.updatePassword(req.user.id, currentPassword, newPassword);
     }
     deleteProfile(req) {
@@ -42,6 +48,22 @@ let UsersController = class UsersController {
 };
 exports.UsersController = UsersController;
 __decorate([
+    (0, common_1.Post)('request'),
+    __param(0, (0, common_1.Body)('email')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", void 0)
+], UsersController.prototype, "requestEmail", null);
+__decorate([
+    (0, common_1.Post)('reset-password'),
+    __param(0, (0, common_1.Query)('token')),
+    __param(1, (0, common_1.Body)('newPassword')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, String]),
+    __metadata("design:returntype", void 0)
+], UsersController.prototype, "resetPassword", null);
+__decorate([
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
     (0, common_1.Get)('profile'),
     __param(0, (0, common_1.Request)()),
     __metadata("design:type", Function),
@@ -49,6 +71,7 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], UsersController.prototype, "getProfile", null);
 __decorate([
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
     (0, common_1.Get)('stats'),
     __param(0, (0, common_1.Request)()),
     __metadata("design:type", Function),
@@ -56,6 +79,7 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], UsersController.prototype, "getStats", null);
 __decorate([
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
     (0, common_1.Put)('email'),
     __param(0, (0, common_1.Request)()),
     __param(1, (0, common_1.Body)('email')),
@@ -65,6 +89,7 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], UsersController.prototype, "updateEmail", null);
 __decorate([
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
     (0, common_1.Put)('username'),
     __param(0, (0, common_1.Request)()),
     __param(1, (0, common_1.Body)('username')),
@@ -73,15 +98,17 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], UsersController.prototype, "updateUsername", null);
 __decorate([
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
     (0, common_1.Put)('password'),
     __param(0, (0, common_1.Request)()),
     __param(1, (0, common_1.Body)('currentPassword')),
     __param(2, (0, common_1.Body)('newPassword')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object, String, String]),
-    __metadata("design:returntype", Promise)
+    __metadata("design:returntype", void 0)
 ], UsersController.prototype, "updatePassword", null);
 __decorate([
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
     (0, common_1.Delete)('delete'),
     __param(0, (0, common_1.Request)()),
     __metadata("design:type", Function),
@@ -90,7 +117,6 @@ __decorate([
 ], UsersController.prototype, "deleteProfile", null);
 exports.UsersController = UsersController = __decorate([
     (0, common_1.Controller)('users'),
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
     __metadata("design:paramtypes", [users_service_1.UsersService])
 ], UsersController);
 //# sourceMappingURL=users.controller.js.map

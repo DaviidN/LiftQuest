@@ -2,10 +2,16 @@ import { UsersService } from './users.service';
 export declare class UsersController {
     private usersService;
     constructor(usersService: UsersService);
+    requestEmail(email: string): Promise<{
+        message: string;
+    } | undefined>;
+    resetPassword(token: string, newPassword: string): Promise<{
+        message: string;
+    }>;
     getProfile(req: any): Promise<{
+        id: string;
         email: string;
         username: string;
-        id: string;
         totalXP: number;
         createdAt: Date;
         _count: {

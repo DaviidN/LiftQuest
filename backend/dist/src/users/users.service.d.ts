@@ -7,9 +7,9 @@ export declare class UsersService {
     private emailService;
     constructor(prisma: PrismaService, jwtService: JwtService, emailService: EmailService);
     getProfile(userId: string): Promise<{
+        id: string;
         email: string;
         username: string;
-        id: string;
         totalXP: number;
         createdAt: Date;
         _count: {
@@ -18,14 +18,16 @@ export declare class UsersService {
         };
     } | null>;
     updateXP(userId: string, xpToAdd: number): Promise<{
+        id: string;
         email: string;
         username: string;
         password: string;
-        id: string;
         totalXP: number;
         isEmailVerified: boolean;
         emailVerificationToken: string | null;
         emailVerificationExpires: Date | null;
+        passwordResetToken: string | null;
+        passwordResetExpires: Date | null;
         createdAt: Date;
         updatedAt: Date;
     }>;
@@ -56,6 +58,12 @@ export declare class UsersService {
         };
     }>;
     updatePassword(userId: string, currentPassword: string, newPassword: string): Promise<{
+        message: string;
+    }>;
+    requestEmail(email: string): Promise<{
+        message: string;
+    } | undefined>;
+    resetPassword(token: string, newPassword: string): Promise<{
         message: string;
     }>;
     deleteProfile(userId: string): Promise<{

@@ -3,6 +3,7 @@ import { X, Mail, Lock, User, Eye, EyeOff } from "lucide-react";
 import { Button } from "../UI/Button";
 import { Input } from "../UI/Input";
 import { useAuthActions } from "../../hooks/userAuthActions";
+import { useLocation } from "wouter";
 
 
 interface AuthModalProps {
@@ -24,6 +25,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     password: false,
     username: false,
   });
+  const [, setLocation] = useLocation();
 
   const { login, signup } = useAuthActions();
 
@@ -166,15 +168,22 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                 }`}
               />
               <Button
-                  type="button"
                   variant="ghost"
                   size="sm"
                   onClick={() => setShowPassword((p) => !p)}
-                  className="absolute right-1 top-1/2 -translate-y-1/2 !p-1 bg-transparent text-slate-900"
+                  className="absolute right-1 top-1/2 -translate-y-1/2 !p-1 bg-transparent text-slate-400"
               >
                   {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
               </Button>
             </div>
+              <Button
+                  variant="ghost"
+                  size="sm"
+                  className="bg-transparent outline-none text-purple-600 -mx-3 hover:bg-transparent hover:text-purple-400"
+                  onClick={() => setLocation("/update-user?field=request")}
+              >
+                Forgot your password?
+              </Button>
             {touched.password && !password && (
               <p className="text-red-400 text-sm mt-1">Password is required</p>
             )}

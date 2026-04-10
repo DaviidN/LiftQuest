@@ -224,6 +224,50 @@ let UsersService = class UsersService {
         });
         return { message: 'Password updated successfully' };
     }
+    async requestEmail(email) {
+        const user = await this.prisma.user.findFirst({
+            where: { email },
+        });
+        if (!user) {
+            return;
+        }
+        const resetToken = (0, crypto_1.randomUUID)();
+        const resetExpires = new Date(Date.now() + 60 * 60 * 1000);
+        await this.prisma.user.update({
+            where: { id: user.id },
+            data: {
+                passwordResetToken: resetToken,
+                passwordResetExpires: resetExpires,
+            },
+        });
+        await this.emailService.sendPasswordResetEmail(user.email, user.username, resetToken);
+        return { message: 'If that email exists, a reset link has been sent.' };
+    }
+    async resetPassword(token, newPassword) {
+        const user = await this.prisma.user.findFirst({
+            where: {
+                passwordResetToken: token,
+                passwordResetExpires: { gt: new Date() },
+            }
+        });
+        if (!user) {
+            throw new common_1.UnauthorizedException('Invalid or expired reset token.');
+        }
+        const hashed = await bcrypt.hash(newPassword, 10);
+        const isSamePassword = await bcrypt.compare(newPassword, user.password);
+        if (isSamePassword) {
+            throw new common_1.ConflictException('New password must be different');
+        }
+        await this.prisma.user.update({
+            where: { id: user.id },
+            data: {
+                password: hashed,
+                passwordResetToken: null,
+                passwordResetExpires: null,
+            },
+        });
+        return { message: 'Password has been reset successfully.' };
+    }
     async deleteProfile(userId) {
         const existingUser = await this.prisma.user.findFirst({
             where: { id: userId },

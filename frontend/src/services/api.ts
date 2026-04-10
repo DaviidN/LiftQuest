@@ -161,6 +161,23 @@ export const api = {
     return response.json();
   },
 
+  async resetPassword(newPassword: string, token: string){
+    const response = await fetch(`${API_URL}/users/reset-password?token=${token}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ newPassword }),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Email verification failed');
+    }
+
+    return response.json();
+  },
+
   async updatePassword(currentPassword: string, newPassword: string) {
     const token = getAuthToken();
     const response = await fetch(`${API_URL}/users/password`, {
@@ -287,7 +304,7 @@ export const api = {
     return response.json();
   },
 
-  // Email verification
+  // Email 
   async verifyEmail(token: string): Promise<{ message: string; token?: string; user?: { id: string; email: string; username: string; totalXP: number; isEmailVerified: boolean } }> {
     const response = await fetch(`${API_URL}/auth/verify-email?token=${token}`);
 
@@ -311,6 +328,23 @@ export const api = {
     if (!response.ok) {
       const error = await response.json();
       throw new Error(error.message || 'Failed to resend verification email');
+    }
+
+    return response.json();
+  },
+
+  async requestEmail(email: string): Promise<{ message: string }> {
+    const response = await fetch(`${API_URL}/users/request`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email }),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Failed to send email');
     }
 
     return response.json();

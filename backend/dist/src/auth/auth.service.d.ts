@@ -29,9 +29,9 @@ export declare class AuthService {
         };
     }>;
     validateUser(userId: string): Promise<{
+        id: string;
         email: string;
         username: string;
-        id: string;
         totalXP: number;
         workouts: {
             id: string;

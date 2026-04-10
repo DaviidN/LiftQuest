@@ -9,9 +9,9 @@ export declare class WorkoutsService {
         exercises: ({
             sets: {
                 id: string;
+                exerciseId: string;
                 weight: number;
                 reps: number;
-                exerciseId: string;
             }[];
         } & {
             id: string;
@@ -34,9 +34,9 @@ export declare class WorkoutsService {
         exercises: ({
             sets: {
                 id: string;
+                exerciseId: string;
                 weight: number;
                 reps: number;
-                exerciseId: string;
             }[];
         } & {
             id: string;
@@ -59,9 +59,9 @@ export declare class WorkoutsService {
         exercises: ({
             sets: {
                 id: string;
+                exerciseId: string;
                 weight: number;
                 reps: number;
-                exerciseId: string;
             }[];
         } & {
             id: string;
