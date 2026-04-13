@@ -16,6 +16,7 @@ exports.UsersController = void 0;
 const common_1 = require("@nestjs/common");
 const jwt_auth_guard_1 = require("../auth/guards/jwt-auth.guard");
 const users_service_1 = require("./users.service");
+const update_password_dto_1 = require("./dto/update-password.dto");
 let UsersController = class UsersController {
     usersService;
     constructor(usersService) {
@@ -24,7 +25,7 @@ let UsersController = class UsersController {
     requestEmail(email) {
         return this.usersService.requestEmail(email);
     }
-    resetPassword(token, newPassword) {
+    resetPassword(token, { newPassword }) {
         return this.usersService.resetPassword(token, newPassword);
     }
     getProfile(req) {
@@ -39,7 +40,7 @@ let UsersController = class UsersController {
     updateUsername(req, username) {
         return this.usersService.updateUsername(req.user.id, username);
     }
-    updatePassword(req, currentPassword, newPassword) {
+    updatePassword(req, currentPassword, { newPassword }) {
         return this.usersService.updatePassword(req.user.id, currentPassword, newPassword);
     }
     deleteProfile(req) {
@@ -57,9 +58,9 @@ __decorate([
 __decorate([
     (0, common_1.Post)('reset-password'),
     __param(0, (0, common_1.Query)('token')),
-    __param(1, (0, common_1.Body)('newPassword')),
+    __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, String]),
+    __metadata("design:paramtypes", [String, update_password_dto_1.UpdatePasswordDto]),
     __metadata("design:returntype", void 0)
 ], UsersController.prototype, "resetPassword", null);
 __decorate([
@@ -102,9 +103,9 @@ __decorate([
     (0, common_1.Put)('password'),
     __param(0, (0, common_1.Request)()),
     __param(1, (0, common_1.Body)('currentPassword')),
-    __param(2, (0, common_1.Body)('newPassword')),
+    __param(2, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object, String, String]),
+    __metadata("design:paramtypes", [Object, String, update_password_dto_1.UpdatePasswordDto]),
     __metadata("design:returntype", void 0)
 ], UsersController.prototype, "updatePassword", null);
 __decorate([

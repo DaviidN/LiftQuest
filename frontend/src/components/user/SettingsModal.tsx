@@ -42,7 +42,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 onClick={onClose}
                 variant="tertiary"
             >
-                <X className="w-6 h-6" />
+                <X size={24} />
             </Button>
             </div>
             {/*Settings Body*/}

@@ -125,6 +125,12 @@ let UsersService = class UsersService {
         };
     }
     async updateEmail(userId, updatedEmail, currentPassword) {
+        const isEmailUsed = await this.prisma.user.findFirst({
+            where: { email: updatedEmail }
+        });
+        if (isEmailUsed) {
+            throw new common_1.ConflictException('Email is already in use');
+        }
         const user = await this.prisma.user.findFirst({
             where: { id: userId },
         });
@@ -166,6 +172,12 @@ let UsersService = class UsersService {
         };
     }
     async updateUsername(userId, updatedUsername) {
+        const isUsernameUsed = await this.prisma.user.findFirst({
+            where: { username: updatedUsername }
+        });
+        if (isUsernameUsed) {
+            throw new common_1.ConflictException('Username already in use');
+        }
         const user = await this.prisma.user.findFirst({
             where: { id: userId },
         });
@@ -174,12 +186,6 @@ let UsersService = class UsersService {
         }
         if (user.username === updatedUsername) {
             throw new common_1.ConflictException('New username must be different');
-        }
-        const isUsernameUsed = await this.prisma.user.findFirst({
-            where: { username: updatedUsername }
-        });
-        if (isUsernameUsed) {
-            throw new common_1.ConflictException('Username already in use');
         }
         const updatedUser = await this.prisma.user.update({
             where: { id: userId },

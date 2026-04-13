@@ -1,6 +1,7 @@
 import { Controller, Get, UseGuards, Request, Put, Body, Delete, Post, Query } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { UsersService } from './users.service';
+import { UpdatePasswordDto } from './dto/update-password.dto';
 
 @Controller('users')
 export class UsersController {
@@ -12,7 +13,7 @@ export class UsersController {
   }
 
   @Post('reset-password')
-  resetPassword(@Query('token') token: string, @Body('newPassword') newPassword: string) {
+  resetPassword(@Query('token') token: string, @Body() { newPassword }: UpdatePasswordDto) {
     return this.usersService.resetPassword(token, newPassword);
   }
 
@@ -49,7 +50,7 @@ export class UsersController {
   updatePassword(
     @Request() req,
     @Body('currentPassword') currentPassword: string,
-    @Body('newPassword') newPassword: string,
+    @Body() { newPassword }: UpdatePasswordDto,
   ) {
     return this.usersService.updatePassword(req.user.id, currentPassword, newPassword);
   }

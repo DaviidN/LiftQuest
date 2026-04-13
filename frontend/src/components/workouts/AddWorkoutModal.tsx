@@ -144,7 +144,7 @@ export const AddWorkoutModal: React.FC<AddWorkoutModalProps> = ({ onClose, onAdd
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-2xl font-bold">New workout</h2>
             <Button onClick={onClose} variant='secondary'>
-              <X/>
+              <X size={20}/>
             </Button>
           </div>
 
@@ -167,7 +167,7 @@ export const AddWorkoutModal: React.FC<AddWorkoutModalProps> = ({ onClose, onAdd
                   size='lg'
                   className={'flex-1 py-2 rounded-lg transition-all'}
                 >
-                  <Dumbbell/>
+                  <Dumbbell size={20}/>
                   Strength
                 </Button>
                 <Button
@@ -176,7 +176,7 @@ export const AddWorkoutModal: React.FC<AddWorkoutModalProps> = ({ onClose, onAdd
                   size='lg'
                   className={'flex-1 py-2 rounded-lg transition-all'}
                 >
-                  <Activity/>
+                  <Activity size={20}/>
                   Airbike
                 </Button>
               </div>

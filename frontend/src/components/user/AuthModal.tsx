@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { X, Mail, Lock, User, Eye, EyeOff } from "lucide-react";
+import { X, Mail, Lock, User, Eye, EyeOff, Check } from "lucide-react";
 import { Button } from "../UI/Button";
 import { Input } from "../UI/Input";
 import { useAuthActions } from "../../hooks/userAuthActions";
@@ -18,6 +18,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   const [password, setPassword] = useState("");
   const [username, setUsername] = useState("");
   const [loading, setLoading] = useState(false);
+  const [passFocused, setPassFocused] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [touched, setTouched] = useState({
@@ -25,8 +26,15 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     password: false,
     username: false,
   });
-  const [, setLocation] = useLocation();
 
+  const validationList = [
+    {message: "Must be between 8 and 32 characters long.", valid: /^.{8,32}$/.test(password)},
+    {message: "Must contain atleast one uppercase letter.", valid: /[A-Z]/.test(password)},
+    {message: "Must contain atleast one lowercase letter.", valid: /[a-z]/.test(password)},
+    {message: "Must contain atleast one number.", valid: /[0-9]/.test(password)}
+  ]
+
+  const [, setLocation] = useLocation();
   const { login, signup } = useAuthActions();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -76,7 +84,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             onClick={onClose}
             variant="tertiary"
           >
-            <X className="w-6 h-6" />
+            <X size={24} />
           </Button>
         </div>
 
@@ -106,7 +114,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                 Username
               </label>
               <div className="relative">
-                <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <User size={20} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
                 <Input
                   type="text"
                   auth
@@ -131,7 +139,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               Email
             </label>
             <div className="relative">
-              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <Mail size={20} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
               <Input
                 type="email"
                 placeholder="your@email.com"
@@ -154,28 +162,34 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               Password
             </label>
             <div className="relative">
-              <Lock className="absolute left-2 top-1/2 -translate-y-1/2 w-7 h-7 p-1 rounded-xl text-slate-400"/>
+              <Lock size={28} className="absolute left-2 top-1/2 -translate-y-1/2 p-1 rounded-xl text-slate-400"/>
               <Input
                 auth
                 type={ showPassword ? "text" : "password"}
                 placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                onFocus={() => setPassFocused(true)}
+                onBlur={() => setPassFocused(false)}
                 className={`pl-11 ${
                   touched.password && !password
                     ? 'ring-2 ring-red-500 focus:ring-red-500'
                     : 'focus:ring-purple-500'
                 }`}
               />
-              <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setShowPassword((p) => !p)}
-                  className="absolute right-1 top-1/2 -translate-y-1/2 !p-1 bg-transparent text-slate-400"
-              >
-                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-              </Button>
+              {passFocused &&
+              <span onMouseDown={(e) => e.preventDefault()}>
+                <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setShowPassword((p) => !p)}
+                    className="absolute right-1 top-1/2 -translate-y-1/2 !p-1 bg-transparent text-slate-400"
+                >
+                    {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                </Button>
+              </span>}
             </div>
+              {mode === "login" && 
               <Button
                   variant="ghost"
                   size="sm"
@@ -183,7 +197,14 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                   onClick={() => setLocation("/update-user?field=request")}
               >
                 Forgot your password?
-              </Button>
+              </Button>}
+            {(passFocused && mode === "signup") && (
+              <div className="absolute my-1 -mx-1 border-2 border-purple-600 bg-slate-600 rounded-lg p-3">
+                {validationList.map((val, i) => (
+                      <p key={i} className={`text-sm ${val.valid ? "text-green-400" : "text-slate-400"}`}>{val.valid ? <div className="flex flex-row items-center gap-1"><Check size={16}/> {val.message}</div> : val.message}</p>
+                ))}
+              </div>
+            )}
             {touched.password && !password && (
               <p className="text-red-400 text-sm mt-1">Password is required</p>
             )}

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useSearch, useLocation } from 'wouter';
-import { CheckCircle, XCircle, Loader2, X, Mail, Lock, User, Eye, EyeOff } from 'lucide-react';
+import { CheckCircle, XCircle, Loader2, X, Mail, Lock, User, Eye, EyeOff, Check } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { api } from '../services/api';
 import { Button } from '../components/UI/Button';
@@ -46,13 +46,22 @@ export const UpdateUser = () => {
     const [token, setToken] = useState<string | null>(null);
     const [value, setValue] = useState('');
     const [currentPassword, setCurrentPassword] = useState('');
+    const [currentPasswordFocused, setCurrentPasswordFocused] = useState(false);
     const [confirmPassword, setConfirmPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+    const [focused, setFocused] = useState(false);
     const [status, setStatus] = useState<Status>('idle');
     const [errorMessage, setErrorMessage] = useState('');
 
-    const IconComponent = (field? ICONS[field] : null) || Lock
+    const IconComponent = (field ? ICONS[field] : null) || Lock
+
+    const validationList = [
+        { message: "Must be between 8 and 32 characters long.", valid: /^.{8,32}$/.test(value) },
+        { message: "Must contain atleast one uppercase letter.", valid: /[A-Z]/.test(value) },
+        { message: "Must contain atleast one lowercase letter.", valid: /[a-z]/.test(value) },
+        { message: "Must contain atleast one number.", valid: /[0-9]/.test(value) }
+    ]
 
     useEffect(() => {
         const params = new URLSearchParams(searchString);
@@ -119,7 +128,7 @@ export const UpdateUser = () => {
                         size="sm"
                         className="absolute -top-10 -right-20"
                     >
-                        <X />
+                        <X size={20} />
                         Back to dashboard
                     </Button>
                 </div>
@@ -134,7 +143,7 @@ export const UpdateUser = () => {
                 <div className="flex items-center justify-between p-6 border-b border-slate-700">
                     <h2 className="text-2xl font-bold text-white">{FIELD_TITLES[field]}</h2>
                     <Button onClick={() => setLocation('/')} variant="tertiary">
-                        <X className="w-6 h-6" />
+                        <X size={24} />
                     </Button>
                 </div>
 
@@ -142,7 +151,7 @@ export const UpdateUser = () => {
                 <div className="p-6">
                     {status === 'success' ? (
                         <div className="flex flex-col items-center gap-4 py-6 text-center">
-                            <CheckCircle className="w-14 h-14 text-green-400" />
+                            <CheckCircle size={56} className="text-green-400" />
                             <p className="text-lg font-semibold text-white">
                                 {field === 'email' && 'Email updated successfully!'}
                                 {field === 'username' && 'Username changed successfully!'}
@@ -159,59 +168,79 @@ export const UpdateUser = () => {
                                 <div className="flex flex-col gap-1">
                                     <label className="text-sm text-slate-400">Current Password</label>
                                     <div className="relative">
-                                        <Lock className="absolute left-2 top-1/2 -translate-y-1/2 w-7 h-7 p-1 rounded-xl text-slate-400"/>
+                                        <Lock size={28} className="absolute left-2 top-1/2 -translate-y-1/2 p-1 rounded-xl text-slate-400"/>
                                         <Input
                                             type={showCurrentPassword ? 'text' : 'password'}
                                             value={currentPassword}
                                             onChange={(e) => setCurrentPassword(e.target.value)}
+                                            onFocus={() => setCurrentPasswordFocused(true)}
+                                            onBlur={() => setCurrentPasswordFocused(false)}
                                             placeholder="Enter current password"
                                             auth
                                             className="pl-11"
                                         />
-                                        <Button
-                                            type="button"
-                                            variant="ghost"
-                                            size="sm"
-                                            onClick={() => setShowCurrentPassword((p) => !p)}
-                                            className="absolute right-1 top-1/2 -translate-y-1/2 !p-1 text-slate-400"
-                                        >
-                                            {showCurrentPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                                        </Button>
+                                        {currentPasswordFocused && 
+                                        <span onMouseDown={(e) => e.preventDefault()}>
+                                            <Button
+                                                type="button"
+                                                variant="ghost"
+                                                size="sm"
+                                                onClick={() => setShowCurrentPassword((p) => !p)}
+                                                className="absolute right-1 top-1/2 -translate-y-1/2 !p-1 text-slate-400"
+                                            >
+                                                {showCurrentPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                                            </Button>
+                                        </span>
+                                        }
                                     </div>
                                 </div>
                             )}
 
-                            <div className="flex flex-col gap-1">
+                            <div className="flex flex-col gap-1 relative">
                                 <label className="text-sm text-slate-400">{FIELD_LABELS[field]}</label>
                                 <div className="relative">
-                                    <IconComponent className="absolute left-2 top-1/2 -translate-y-1/2 w-7 h-7 p-1 rounded-xl text-slate-400"/>
+                                    <IconComponent size={28} className="absolute left-2 top-1/2 -translate-y-1/2 p-1 rounded-xl text-slate-400"/>
                                     <Input
                                         type={(field === 'password' || field === 'password_reset') ? (showPassword ? 'text' : 'password') : (field === 'email' || field === 'request') ? 'email' : 'text'}
                                         value={value}
                                         onChange={(e) => setValue(e.target.value)}
+                                        onFocus={() => setFocused(true)}
+                                        onBlur={() => setFocused(false)}
                                         placeholder={field === 'email' ? 'Enter new email' : field === 'username' ? 'Enter new username' : field === 'request' ? 'Enter your email' : 'Enter new password'}
                                         auth
                                         className="pl-11"
                                     />
-                                    {(field === 'password' || field === 'password_reset') && (
-                                        <Button
-                                            type="button"
-                                            variant="ghost"
-                                            size="sm"
-                                            onClick={() => setShowPassword((p) => !p)}
-                                            className="absolute right-1 top-1/2 -translate-y-1/2 !p-1 text-slate-400"
-                                        >
-                                            {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                                        </Button>
+                                    {focused && (field === 'password' || field === 'password_reset') && (
+                                        <span onMouseDown={(e) => e.preventDefault()}>
+                                            <Button
+                                                type="button"
+                                                variant="ghost"
+                                                size="sm"
+                                                onClick={() => setShowPassword((p) => !p)}
+                                                className="absolute right-1 top-1/2 -translate-y-1/2 !p-1 text-slate-400"
+                                            >
+                                                {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                                            </Button>
+                                        </span>
                                     )}
                                 </div>
+
+                            {(focused && (field === 'password' || field === 'password_reset')) && (
+                                <div className="absolute top-full z-10 my-1 -mx-1 border-2 border-purple-600 bg-slate-600 rounded-lg p-3">
+                                    {validationList.map((val, i) => (
+                                        <p key={i} className={`text-sm ${val.valid ? 'text-green-400' : 'text-slate-400'}`}>
+                                            {val.valid ? <><Check size={16} className="inline mr-1" />{val.message}</> : val.message}
+                                        </p>
+                                    ))}
+                                </div>
+                            )}
                             </div>
 
                             {(field === 'password' || field === 'email' || field === 'password_reset') && (
                                 <div className="flex flex-col gap-1">
                                     <label className="text-sm text-slate-400">{field === 'email' ? "Password for confirmation " : "Confirm New Password"}</label>
                                     <div className="relative">
-                                        <Lock className="absolute left-2 top-1/2 -translate-y-1/2 w-7 h-7 p-1 rounded-xl text-slate-400"/>
+                                        <Lock size={28} className="absolute left-2 top-1/2 -translate-y-1/2 p-1 rounded-xl text-slate-400"/>
                                         <Input
                                             type="password"
                                             value={confirmPassword}
@@ -219,14 +248,14 @@ export const UpdateUser = () => {
                                             placeholder={field === 'email' ? "Enter password" : "Confirm New Password"}
                                             auth
                                             className="pl-11"
-                                        />
+                                        />  
                                     </div>
                                 </div>
                             )}
 
                             {status === 'error' && (
                                 <div className="flex items-center gap-2 text-red-400 text-sm bg-red-400/10 rounded-lg px-3 py-2">
-                                    <XCircle className="w-4 h-4 shrink-0" />
+                                    <XCircle size={16} className="shrink-0" />
                                     {errorMessage}
                                 </div>
                             )}
@@ -239,7 +268,7 @@ export const UpdateUser = () => {
                             >
                                 {status === 'loading' ? (
                                     <>
-                                        <Loader2 className="w-4 h-4 animate-spin" />
+                                        <Loader2 size={16} className="animate-spin" />
                                             {field === 'request' ? "Sending..." : "Saving..."}
                                     </>
                                 ) : (

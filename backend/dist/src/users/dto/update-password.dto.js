@@ -9,31 +9,19 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.SignupDto = void 0;
+exports.UpdatePasswordDto = void 0;
 const class_validator_1 = require("class-validator");
-class SignupDto {
-    email;
-    username;
-    password;
+class UpdatePasswordDto {
+    newPassword;
 }
-exports.SignupDto = SignupDto;
-__decorate([
-    (0, class_validator_1.IsEmail)(),
-    __metadata("design:type", String)
-], SignupDto.prototype, "email", void 0);
+exports.UpdatePasswordDto = UpdatePasswordDto;
 __decorate([
     (0, class_validator_1.IsString)(),
-    (0, class_validator_1.MinLength)(3),
-    (0, class_validator_1.MaxLength)(20),
-    __metadata("design:type", String)
-], SignupDto.prototype, "username", void 0);
-__decorate([
-    (0, class_validator_1.IsString)(),
-    (0, class_validator_1.MinLength)(8),
+    (0, class_validator_1.MinLength)(6),
     (0, class_validator_1.MaxLength)(32),
     (0, class_validator_1.Matches)(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/, {
         message: 'Password must contain at least one uppercase letter, one lowercase letter, and one number',
     }),
     __metadata("design:type", String)
-], SignupDto.prototype, "password", void 0);
-//# sourceMappingURL=signup.dto.js.map
+], UpdatePasswordDto.prototype, "newPassword", void 0);
+//# sourceMappingURL=update-password.dto.js.map

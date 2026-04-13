@@ -91,6 +91,14 @@ export class UsersService {
   }
 
   async updateEmail(userId: string, updatedEmail: string, currentPassword: string){
+    const isEmailUsed = await this.prisma.user.findFirst({
+      where: {email: updatedEmail}
+    })
+
+    if(isEmailUsed){
+      throw new ConflictException('Email is already in use');
+    }
+
     const user = await this.prisma.user.findFirst({
       where: { id: userId },
     });
@@ -102,11 +110,11 @@ export class UsersService {
     const isCurrentPasswordCorrect = await bcrypt.compare(currentPassword, user.password);
 
     if(!isCurrentPasswordCorrect) {
-      throw new UnauthorizedException('Incorrect password')
+      throw new UnauthorizedException('Incorrect password');
     }
 
     if(user.email === updatedEmail){
-      throw new ConflictException('New email must be different')
+      throw new ConflictException('New email must be different');
     }
 
     // Generate email verification token
@@ -151,6 +159,14 @@ export class UsersService {
   }
 
   async updateUsername(userId: string, updatedUsername: string){
+    const isUsernameUsed = await this.prisma.user.findFirst({
+      where: {username: updatedUsername}
+    })
+
+    if(isUsernameUsed){
+      throw new ConflictException('Username already in use')
+    }
+
     const user = await this.prisma.user.findFirst({
       where: { id: userId },
     });
@@ -163,13 +179,6 @@ export class UsersService {
       throw new ConflictException('New username must be different')
     }
 
-    const isUsernameUsed = await this.prisma.user.findFirst({
-      where: {username: updatedUsername}
-    })
-
-    if(isUsernameUsed){
-      throw new ConflictException('Username already in use')
-    }
 
     const updatedUser = await this.prisma.user.update({
       where: {id: userId},

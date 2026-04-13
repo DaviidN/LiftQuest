@@ -18,7 +18,7 @@ export const LevelCard: React.FC<LevelCardProps> = ({
     <div className="bg-white/10 backdrop-blur-lg rounded-xl p-6 mb-6">
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-3">
-          <Trophy className="w-8 h-8 text-yellow-400" />
+          <Trophy size={32} className="text-yellow-400" />
           <div>
             <div className="text-2xl font-bold">Level {level}</div>
             <div className="text-sm text-gray-300">{totalXP} total XP</div>

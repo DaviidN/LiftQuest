@@ -70,7 +70,7 @@ export const Button: React.FC<ButtonProps> = ({
       disabled={disabled}
       className={`text-center ${combinedStyles}`}
     >
-      {Icon && <Icon className="w-5 h-5" />}
+      {Icon && <Icon size={20} />}
       {children}
     </button>
   );

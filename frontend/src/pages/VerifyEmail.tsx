@@ -55,7 +55,7 @@ export const VerifyEmail = () => {
       <div className="bg-secondary rounded-2xl max-w-md w-full shadow-2xl border border-slate-700 p-8 text-center">
         {status === 'loading' && (
           <>
-            <Loader2 className="w-16 h-16 mx-auto mb-4 text-purple-400 animate-spin" />
+            <Loader2 size={64} className="mx-auto mb-4 text-purple-400 animate-spin" />
             <h1 className="text-2xl font-bold mb-2">Verifying your email...</h1>
             <p className="text-gray-400">Please wait while we verify your email address.</p>
           </>
@@ -63,7 +63,7 @@ export const VerifyEmail = () => {
 
         {status === 'success' && (
           <>
-            <CheckCircle className="w-16 h-16 mx-auto mb-4 text-green-400" />
+            <CheckCircle size={64} className="mx-auto mb-4 text-green-400" />
             <h1 className="text-2xl font-bold mb-2">Email Verified!</h1>
             <p className="text-gray-400 mb-6">{message}</p>
             <Button
@@ -78,7 +78,7 @@ export const VerifyEmail = () => {
 
         {status === 'error' && (
           <>
-            <XCircle className="w-16 h-16 mx-auto mb-4 text-red-400" />
+            <XCircle size={64} className="mx-auto mb-4 text-red-400" />
             <h1 className="text-2xl font-bold mb-2">Verification Failed</h1>
             <p className="text-gray-400 mb-6">{message}</p>
             <Button

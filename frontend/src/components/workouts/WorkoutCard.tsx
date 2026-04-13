@@ -14,15 +14,15 @@ export const WorkoutCard: React.FC<WorkoutCardProps> = ({ workout, calculate1RM 
         <div>
           <div className="flex items-center gap-2 mb-1">
             {workout.type === 'strength' ? (
-              <Dumbbell className="w-5 h-5 text-purple-400" />
+              <Dumbbell size={20} className="text-purple-400" />
             ) : (
-              <Activity className="w-5 h-5 text-pink-400" />
+              <Activity size={20} className="text-pink-400" />
             )}
             <span className="font-bold">
               {workout.type === 'strength' ? 'Strength Workout' : 'Airbike'}
             </span>
           </div>
-          <div className="text-sm text-gray-400">
+          <div className="text-sm text-slate-400">
             {new Date(workout.date).toLocaleDateString('cs-CZ')}
           </div>
         </div>
@@ -41,7 +41,7 @@ export const WorkoutCard: React.FC<WorkoutCardProps> = ({ workout, calculate1RM 
               </div>
             ))}
           </div>
-          <div className="text-xs text-gray-400 mt-1">
+          <div className="text-xs text-slate-400 mt-1">
             Est. 1RM: {Math.max(...ex.sets.map(s => calculate1RM(s.weight, s.reps)))}kg
           </div>
         </div>
@@ -50,15 +50,15 @@ export const WorkoutCard: React.FC<WorkoutCardProps> = ({ workout, calculate1RM 
       {workout.type === 'airbike' && (
         <div className="grid grid-cols-3 gap-4 text-sm">
           <div>
-            <div className="text-gray-400">Time</div>
+            <div className="text-slate-400">Time</div>
             <div className="font-bold">{workout.time} min</div>
           </div>
           <div>
-            <div className="text-gray-400">Calories</div>
+            <div className="text-slate-400">Calories</div>
             <div className="font-bold">{workout.calories} kcal</div>
           </div>
           <div>
-            <div className="text-gray-400">Distance</div>
+            <div className="text-slate-400">Distance</div>
             <div className="font-bold">{workout.distance} km</div>
           </div>
         </div>

@@ -1,17 +1,18 @@
 import { UsersService } from './users.service';
+import { UpdatePasswordDto } from './dto/update-password.dto';
 export declare class UsersController {
     private usersService;
     constructor(usersService: UsersService);
     requestEmail(email: string): Promise<{
         message: string;
     } | undefined>;
-    resetPassword(token: string, newPassword: string): Promise<{
+    resetPassword(token: string, { newPassword }: UpdatePasswordDto): Promise<{
         message: string;
     }>;
     getProfile(req: any): Promise<{
-        id: string;
         email: string;
         username: string;
+        id: string;
         totalXP: number;
         createdAt: Date;
         _count: {
@@ -45,7 +46,7 @@ export declare class UsersController {
             isEmailVerified: boolean;
         };
     }>;
-    updatePassword(req: any, currentPassword: string, newPassword: string): Promise<{
+    updatePassword(req: any, currentPassword: string, { newPassword }: UpdatePasswordDto): Promise<{
         message: string;
     }>;
     deleteProfile(req: any): Promise<{
