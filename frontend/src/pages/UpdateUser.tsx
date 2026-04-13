@@ -6,11 +6,11 @@ import { api } from '../services/api';
 import { Button } from '../components/UI/Button';
 import { Input } from '../components/UI/Input';
 import { useAuth } from '../context/userSessContext';
+import type { PasswordRule } from '../components/user/AuthModal';
 
 type FieldVariant = 'email' | 'username' | 'password' | 'request' | 'password_reset';
 
 type Status = 'idle' | 'loading' | 'success' | 'error';
-
 
 
 const FIELD_TITLES: Record<FieldVariant, string> = {
@@ -56,7 +56,7 @@ export const UpdateUser = () => {
 
     const IconComponent = (field ? ICONS[field] : null) || Lock
 
-    const validationList = [
+    const validationList: PasswordRule[] = [
         { message: "Must be between 8 and 32 characters long.", valid: /^.{8,32}$/.test(value) },
         { message: "Must contain atleast one uppercase letter.", valid: /[A-Z]/.test(value) },
         { message: "Must contain atleast one lowercase letter.", valid: /[a-z]/.test(value) },

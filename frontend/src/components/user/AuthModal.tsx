@@ -5,6 +5,10 @@ import { Input } from "../UI/Input";
 import { useAuthActions } from "../../hooks/userAuthActions";
 import { useLocation } from "wouter";
 
+export type PasswordRule = {
+  message: string,
+  valid: boolean
+}
 
 interface AuthModalProps {
   onClose: () => void;
@@ -27,7 +31,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     username: false,
   });
 
-  const validationList = [
+  const validationList: PasswordRule[] = [
     {message: "Must be between 8 and 32 characters long.", valid: /^.{8,32}$/.test(password)},
     {message: "Must contain atleast one uppercase letter.", valid: /[A-Z]/.test(password)},
     {message: "Must contain atleast one lowercase letter.", valid: /[a-z]/.test(password)},
