@@ -9,15 +9,15 @@ export class EmailService {
 
   constructor(private configService: ConfigService) {
     this.transporter = nodemailer.createTransport({
-      host: this.configService.get('SMTP_HOST'),
-      port: parseInt(this.configService.get('SMTP_PORT') || '587'),
-      secure: this.configService.get('SMTP_SECURE') === 'true',
+      host: this.configService.get<string>('SMTP_HOST'),
+      port: parseInt(this.configService.get<string>('SMTP_PORT') || '587'),
+      secure: this.configService.get<string>('SMTP_SECURE') === 'true',
       family: 4,
       auth: {
-        user: this.configService.get('SMTP_USER'),
-        pass: this.configService.get('SMTP_PASS'),
+        user: this.configService.get<string>('SMTP_USER'),
+        pass: this.configService.get<string>('SMTP_PASS'),
       },
-    });
+    } as any);
     this.from = this.configService.get('SMTP_FROM') || 'LiftQuest <noreply.liftquest@gmail.com>';
   }
 
