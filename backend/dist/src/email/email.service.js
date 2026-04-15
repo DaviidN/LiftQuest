@@ -11,19 +11,22 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.EmailService = void 0;
 const common_1 = require("@nestjs/common");
-const mailer_1 = require("@nestjs-modules/mailer");
 const config_1 = require("@nestjs/config");
+const resend_1 = require("resend");
 let EmailService = class EmailService {
-    mailerService;
     configService;
-    constructor(mailerService, configService) {
-        this.mailerService = mailerService;
+    resend;
+    from;
+    constructor(configService) {
         this.configService = configService;
+        this.resend = new resend_1.Resend(this.configService.get('RESEND_API_KEY'));
+        this.from = this.configService.get('SMTP_FROM') || 'LiftQuest <onboarding@resend.dev>';
     }
     async sendPasswordResetEmail(email, username, token) {
         const frontendUrl = this.configService.get('FRONTEND_URL') || 'http://localhost:8080';
         const resetUrl = `${frontendUrl}/update-user?field=password_reset&token=${token}`;
-        await this.mailerService.sendMail({
+        await this.resend.emails.send({
+            from: this.from,
             to: email,
             subject: 'Reset your LiftQuest password',
             html: `
@@ -89,7 +92,8 @@ let EmailService = class EmailService {
         const footerNote = isUpdate
             ? "If you didn't request an email change, you can safely ignore this email. Your account remains unchanged."
             : "If you didn't create an account with LiftQuest, you can safely ignore this email.";
-        await this.mailerService.sendMail({
+        await this.resend.emails.send({
+            from: this.from,
             to: email,
             subject,
             html: `
@@ -146,7 +150,6 @@ let EmailService = class EmailService {
 exports.EmailService = EmailService;
 exports.EmailService = EmailService = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [mailer_1.MailerService,
-        config_1.ConfigService])
+    __metadata("design:paramtypes", [config_1.ConfigService])
 ], EmailService);
 //# sourceMappingURL=email.service.js.map

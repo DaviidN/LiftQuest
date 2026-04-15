@@ -23,4 +23,4 @@ RUN npm run build
 EXPOSE 3001
 
 # Start command (will be overridden by docker-compose)
-CMD npx prisma migrate deploy && node dist/src/main.js
+CMD until npx prisma migrate deploy; do echo "DB not ready, retrying in 5s..."; sleep 5; done && node dist/src/main.js

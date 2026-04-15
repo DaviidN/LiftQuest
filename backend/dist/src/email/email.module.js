@@ -8,33 +8,12 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.EmailModule = void 0;
 const common_1 = require("@nestjs/common");
-const mailer_1 = require("@nestjs-modules/mailer");
-const config_1 = require("@nestjs/config");
 const email_service_1 = require("./email.service");
 let EmailModule = class EmailModule {
 };
 exports.EmailModule = EmailModule;
 exports.EmailModule = EmailModule = __decorate([
     (0, common_1.Module)({
-        imports: [
-            mailer_1.MailerModule.forRootAsync({
-                useFactory: (configService) => ({
-                    transport: {
-                        host: configService.get('SMTP_HOST'),
-                        port: configService.get('SMTP_PORT'),
-                        secure: configService.get('SMTP_SECURE') === 'true',
-                        auth: {
-                            user: configService.get('SMTP_USER'),
-                            pass: configService.get('SMTP_PASS'),
-                        },
-                    },
-                    defaults: {
-                        from: `"LiftQuest" <${configService.get('SMTP_FROM')}>`,
-                    },
-                }),
-                inject: [config_1.ConfigService],
-            }),
-        ],
         providers: [email_service_1.EmailService],
         exports: [email_service_1.EmailService],
     })
