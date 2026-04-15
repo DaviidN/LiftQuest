@@ -1,83 +1,79 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import * as nodemailer from 'nodemailer';
+import * as Brevo from '@getbrevo/brevo';
 
 @Injectable()
 export class EmailService {
-  private transporter: nodemailer.Transporter;
+  private apiInstance: Brevo.TransactionalEmailsApi;
   private from: string;
 
   constructor(private configService: ConfigService) {
-    this.transporter = nodemailer.createTransport({
-      host: this.configService.get<string>('SMTP_HOST'),
-      port: parseInt(this.configService.get<string>('SMTP_PORT') || '587'),
-      secure: this.configService.get<string>('SMTP_SECURE') === 'true',
-      family: 4,
-      auth: {
-        user: this.configService.get<string>('SMTP_USER'),
-        pass: this.configService.get<string>('SMTP_PASS'),
-      },
-    } as any);
-    this.from = this.configService.get('SMTP_FROM') || 'LiftQuest <noreply.liftquest@gmail.com>';
+    this.apiInstance = new Brevo.TransactionalEmailsApi();
+    this.apiInstance.setApiKey(
+      Brevo.TransactionalEmailsApiApiKeys.apiKey,
+      this.configService.get<string>('BREVO_API_KEY'),
+    );
+    this.from = this.configService.get<string>('SMTP_FROM') || 'noreply.liftquest@gmail.com';
   }
 
   async sendPasswordResetEmail(email: string, username: string, token: string) {
     const frontendUrl = this.configService.get('FRONTEND_URL') || 'http://localhost:8080';
     const resetUrl = `${frontendUrl}/update-user?field=password_reset&token=${token}`;
 
-    await this.transporter.sendMail({
-      from: this.from,
-      to: email,
-      subject: 'Reset your LiftQuest password',
-      html: `
-        <!DOCTYPE html>
-        <html>
-        <head>
-          <meta charset="utf-8">
-          <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        </head>
-        <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
-          <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; text-align: center; border-radius: 10px 10px 0 0;">
-            <h1 style="color: white; margin: 0;">Password Reset</h1>
+    const sendSmtpEmail = new Brevo.SendSmtpEmail();
+    sendSmtpEmail.sender = { email: this.from, name: 'LiftQuest' };
+    sendSmtpEmail.to = [{ email }];
+    sendSmtpEmail.subject = 'Reset your LiftQuest password';
+    sendSmtpEmail.htmlContent = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      </head>
+      <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+        <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; text-align: center; border-radius: 10px 10px 0 0;">
+          <h1 style="color: white; margin: 0;">Password Reset</h1>
+        </div>
+
+        <div style="background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px;">
+          <p>Hey <strong>${username}</strong>,</p>
+
+          <p>We received a request to reset your LiftQuest password. Click the button below to set a new password.</p>
+
+          <div style="text-align: center; margin: 30px 0;">
+            <a href="${resetUrl}"
+               style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                      color: white;
+                      padding: 15px 30px;
+                      text-decoration: none;
+                      border-radius: 5px;
+                      font-weight: bold;
+                      display: inline-block;">
+              Reset Password
+            </a>
           </div>
 
-          <div style="background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px;">
-            <p>Hey <strong>${username}</strong>,</p>
+          <p style="color: #666; font-size: 14px;">
+            If the button doesn't work, copy and paste this link into your browser:<br>
+            <a href="${resetUrl}" style="color: #667eea; word-break: break-all;">${resetUrl}</a>
+          </p>
 
-            <p>We received a request to reset your LiftQuest password. Click the button below to set a new password.</p>
+          <p style="color: #666; font-size: 14px;">
+            This link will expire in 1 hour.
+          </p>
 
-            <div style="text-align: center; margin: 30px 0;">
-              <a href="${resetUrl}"
-                 style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                        color: white;
-                        padding: 15px 30px;
-                        text-decoration: none;
-                        border-radius: 5px;
-                        font-weight: bold;
-                        display: inline-block;">
-                Reset Password
-              </a>
-            </div>
+          <hr style="border: none; border-top: 1px solid #ddd; margin: 20px 0;">
 
-            <p style="color: #666; font-size: 14px;">
-              If the button doesn't work, copy and paste this link into your browser:<br>
-              <a href="${resetUrl}" style="color: #667eea; word-break: break-all;">${resetUrl}</a>
-            </p>
+          <p style="color: #999; font-size: 12px; text-align: center;">
+            If you didn't request a password reset, you can safely ignore this email. Your password will not be changed.
+          </p>
+        </div>
+      </body>
+      </html>
+    `;
 
-            <p style="color: #666; font-size: 14px;">
-              This link will expire in 1 hour.
-            </p>
-
-            <hr style="border: none; border-top: 1px solid #ddd; margin: 20px 0;">
-
-            <p style="color: #999; font-size: 12px; text-align: center;">
-              If you didn't request a password reset, you can safely ignore this email. Your password will not be changed.
-            </p>
-          </div>
-        </body>
-        </html>
-      `,
-    });
+    await this.apiInstance.sendTransacEmail(sendSmtpEmail);
   }
 
   async sendVerificationEmail(email: string, username: string, token: string, context: 'signup' | 'email-update' = 'signup') {
@@ -96,58 +92,59 @@ export class EmailService {
       ? "If you didn't request an email change, you can safely ignore this email. Your account remains unchanged."
       : "If you didn't create an account with LiftQuest, you can safely ignore this email.";
 
-    await this.transporter.sendMail({
-      from: this.from,
-      to: email,
-      subject,
-      html: `
-        <!DOCTYPE html>
-        <html>
-        <head>
-          <meta charset="utf-8">
-          <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        </head>
-        <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
-          <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; text-align: center; border-radius: 10px 10px 0 0;">
-            <h1 style="color: white; margin: 0;">${heading}</h1>
+    const sendSmtpEmail = new Brevo.SendSmtpEmail();
+    sendSmtpEmail.sender = { email: this.from, name: 'LiftQuest' };
+    sendSmtpEmail.to = [{ email }];
+    sendSmtpEmail.subject = subject;
+    sendSmtpEmail.htmlContent = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      </head>
+      <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+        <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; text-align: center; border-radius: 10px 10px 0 0;">
+          <h1 style="color: white; margin: 0;">${heading}</h1>
+        </div>
+
+        <div style="background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px;">
+          <p>Hey <strong>${username}</strong>,</p>
+
+          <p>${bodyText}</p>
+
+          <div style="text-align: center; margin: 30px 0;">
+            <a href="${verificationUrl}"
+               style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                      color: white;
+                      padding: 15px 30px;
+                      text-decoration: none;
+                      border-radius: 5px;
+                      font-weight: bold;
+                      display: inline-block;">
+              ${buttonLabel}
+            </a>
           </div>
 
-          <div style="background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px;">
-            <p>Hey <strong>${username}</strong>,</p>
+          <p style="color: #666; font-size: 14px;">
+            If the button doesn't work, copy and paste this link into your browser:<br>
+            <a href="${verificationUrl}" style="color: #667eea; word-break: break-all;">${verificationUrl}</a>
+          </p>
 
-            <p>${bodyText}</p>
+          <p style="color: #666; font-size: 14px;">
+            This link will expire in 24 hours.
+          </p>
 
-            <div style="text-align: center; margin: 30px 0;">
-              <a href="${verificationUrl}"
-                 style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                        color: white;
-                        padding: 15px 30px;
-                        text-decoration: none;
-                        border-radius: 5px;
-                        font-weight: bold;
-                        display: inline-block;">
-                ${buttonLabel}
-              </a>
-            </div>
+          <hr style="border: none; border-top: 1px solid #ddd; margin: 20px 0;">
 
-            <p style="color: #666; font-size: 14px;">
-              If the button doesn't work, copy and paste this link into your browser:<br>
-              <a href="${verificationUrl}" style="color: #667eea; word-break: break-all;">${verificationUrl}</a>
-            </p>
+          <p style="color: #999; font-size: 12px; text-align: center;">
+            ${footerNote}
+          </p>
+        </div>
+      </body>
+      </html>
+    `;
 
-            <p style="color: #666; font-size: 14px;">
-              This link will expire in 24 hours.
-            </p>
-
-            <hr style="border: none; border-top: 1px solid #ddd; margin: 20px 0;">
-
-            <p style="color: #999; font-size: 12px; text-align: center;">
-              ${footerNote}
-            </p>
-          </div>
-        </body>
-        </html>
-      `,
-    });
+    await this.apiInstance.sendTransacEmail(sendSmtpEmail);
   }
 }
