@@ -242,7 +242,7 @@ export class UsersService {
     });
 
     if (!user) {
-      return;
+      return { message: 'If that email exists, a reset link has been sent.' };
     }
 
     const resetToken = randomUUID();
