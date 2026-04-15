@@ -9,8 +9,8 @@ export class EmailService {
 
   constructor(private configService: ConfigService) {
     this.client = new BrevoClient({
-      apiKey: this.configService.get<string>('BREVO_API_KEY'),
-      environment: BrevoEnvironment.Production,
+      apiKey: () => this.configService.get<string>('BREVO_API_KEY'),
+      environment: BrevoEnvironment.Default,
     });
     this.from = this.configService.get<string>('SMTP_FROM') || 'noreply.liftquest@gmail.com';
   }
