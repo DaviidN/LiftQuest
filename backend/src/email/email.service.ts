@@ -1,22 +1,30 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { Resend } from 'resend';
+import * as nodemailer from 'nodemailer';
 
 @Injectable()
 export class EmailService {
-  private resend: Resend;
+  private transporter: nodemailer.Transporter;
   private from: string;
 
   constructor(private configService: ConfigService) {
-    this.resend = new Resend(this.configService.get('RESEND_API_KEY'));
-    this.from = this.configService.get('SMTP_FROM') || 'LiftQuest <onboarding@resend.dev>';
+    this.transporter = nodemailer.createTransport({
+      host: this.configService.get('SMTP_HOST'),
+      port: parseInt(this.configService.get('SMTP_PORT') || '587'),
+      secure: this.configService.get('SMTP_SECURE') === 'true',
+      auth: {
+        user: this.configService.get('SMTP_USER'),
+        pass: this.configService.get('SMTP_PASS'),
+      },
+    });
+    this.from = this.configService.get('SMTP_FROM') || 'LiftQuest <noreply.liftquest@gmail.com>';
   }
 
   async sendPasswordResetEmail(email: string, username: string, token: string) {
     const frontendUrl = this.configService.get('FRONTEND_URL') || 'http://localhost:8080';
     const resetUrl = `${frontendUrl}/update-user?field=password_reset&token=${token}`;
 
-    await this.resend.emails.send({
+    await this.transporter.sendMail({
       from: this.from,
       to: email,
       subject: 'Reset your LiftQuest password',
@@ -87,7 +95,7 @@ export class EmailService {
       ? "If you didn't request an email change, you can safely ignore this email. Your account remains unchanged."
       : "If you didn't create an account with LiftQuest, you can safely ignore this email.";
 
-    await this.resend.emails.send({
+    await this.transporter.sendMail({
       from: this.from,
       to: email,
       subject,
