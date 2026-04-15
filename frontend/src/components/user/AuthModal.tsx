@@ -124,6 +124,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                   auth
                   placeholder="johndoe"
                   value={username}
+                  disabled={loading}
                   onChange={(e) => setUsername(e.target.value)}
                   className={`pl-11 ${
                     touched.username && !username
@@ -148,6 +149,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                 type="email"
                 placeholder="your@email.com"
                 value={email}
+                disabled={loading}
                 onChange={(e) => setEmail(e.target.value)}
                 className={`pl-11 ${
                   touched.email && !email
@@ -172,6 +174,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                 type={ showPassword ? "text" : "password"}
                 placeholder="••••••••"
                 value={password}
+                disabled={loading}
                 onChange={(e) => setPassword(e.target.value)}
                 onFocus={() => setPassFocused(true)}
                 onBlur={() => setPassFocused(false)}

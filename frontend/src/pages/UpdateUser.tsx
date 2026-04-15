@@ -172,6 +172,7 @@ export const UpdateUser = () => {
                                         <Input
                                             type={showCurrentPassword ? 'text' : 'password'}
                                             value={currentPassword}
+                                            disabled={status === 'loading'}
                                             onChange={(e) => setCurrentPassword(e.target.value)}
                                             onFocus={() => setCurrentPasswordFocused(true)}
                                             onBlur={() => setCurrentPasswordFocused(false)}
@@ -203,6 +204,7 @@ export const UpdateUser = () => {
                                     <Input
                                         type={(field === 'password' || field === 'password_reset') ? (showPassword ? 'text' : 'password') : (field === 'email' || field === 'request') ? 'email' : 'text'}
                                         value={value}
+                                        disabled={status === 'loading'}
                                         onChange={(e) => setValue(e.target.value)}
                                         onFocus={() => setFocused(true)}
                                         onBlur={() => setFocused(false)}
@@ -244,6 +246,7 @@ export const UpdateUser = () => {
                                         <Input
                                             type="password"
                                             value={confirmPassword}
+                                            disabled={status === 'loading'}
                                             onChange={(e) => setConfirmPassword(e.target.value)}
                                             placeholder={field === 'email' ? "Enter password" : "Confirm New Password"}
                                             auth

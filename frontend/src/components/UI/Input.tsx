@@ -5,6 +5,7 @@ interface InputProps {
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onFocus?: () => void;
   onBlur?: () => void;
+  disabled?: boolean;
   placeholder?: string;
   type?: string;
   auth?: boolean;
@@ -16,6 +17,7 @@ export const Input: React.FC<InputProps> = ({
   onChange,
   onFocus,
   onBlur,
+  disabled = false,
   placeholder,
   type = 'text',
   auth = false,
@@ -42,6 +44,7 @@ export const Input: React.FC<InputProps> = ({
         {...inputProps}   
         placeholder={placeholder}
         value={value}
+        disabled={disabled}
         onChange={onChange}
         onFocus={onFocus}
         onBlur={onBlur}
