@@ -5,12 +5,19 @@ import { AppModule } from './app.module';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  // Enable CORS - allow Railway frontend
+  // Enable CORS
   app.enableCors({
-    origin: [
-      'http://localhost:8080',
-      'https://liftquest.up.railway.app',
-    ],
+    origin: (origin, callback) => {
+      const allowed = [
+        'http://localhost:8080',
+        'https://liftquest.up.railway.app',
+      ];
+      if (!origin || allowed.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error(`CORS blocked: ${origin}`));
+      }
+    },
     credentials: true,
   });
 
