@@ -163,7 +163,7 @@ export const AddWorkoutModal: React.FC<AddWorkoutModalProps> = ({ onClose, onAdd
         });
         onClose();
       } catch (error: any) {
-        setErrorMessage(`* ${error.message}`);
+        setErrorMessage(`* ${error.message.charAt(0).toUpperCase() + error.message.slice(1)}!`);
       } finally {
         setIsLoading(false);
       }

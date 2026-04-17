@@ -135,7 +135,7 @@ let WorkoutsService = class WorkoutsService {
                     },
                 },
             },
-            orderBy: { date: 'desc' },
+            orderBy: [{ date: 'desc' }, { createdAt: 'desc' }],
         });
     }
     async findOne(userId, workoutId) {

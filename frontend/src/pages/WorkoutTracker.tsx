@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/userSessContext';
-import type { Workout } from '../types/workout.types';
+import type { Workout, StrengthWorkout, CardioWorkout } from '../types/workout.types';
 import { calculateLevel, getXPForNextLevel } from '../utils/calculations';
 import { api } from '../services/api';
 import { CircleQuestionMark } from 'lucide-react';
@@ -79,8 +79,8 @@ export const WorkoutTracker = () => {
   const xpProgress = ((totalXP - (level ** 2 * 100)) / (xpForNext - (level ** 2 * 100))) * 100;
 
   const workouts = userSess?.workouts || [];
-  const strengthWorkouts = workouts.filter(w => w.type === 'strength');
-  const cardioWorkouts = workouts.filter(w => w.type === 'cardio');
+  const strengthWorkouts = workouts.filter((w): w is StrengthWorkout => w.type === 'strength');
+  const cardioWorkouts = workouts.filter((w): w is CardioWorkout => w.type === 'cardio');
 
   const workoutStreak = (() => {
     if (workouts.length === 0) return { current: 0, best: 0 };
@@ -104,16 +104,26 @@ export const WorkoutTracker = () => {
     return {current, best};
   })();
 
+  const last30 = (w: { date: string }) =>
+    Date.now() - new Date(w.date).getTime() < 30 * 24 * 60 * 60 * 1000;
+
+  const formatDate = (date: string) =>
+    new Date(date).toLocaleDateString('cs-CZ', { day: '2-digit', month: '2-digit' });
+
   const strengthVolumeData = strengthWorkouts
-    .filter(w => {
-      const diff = Date.now() - new Date(w.date).getTime();
-      return diff < 30 * 24 * 60 * 60 * 1000;
-    })
+    .filter(last30)
     .map(w => ({
-      date: new Date(w.date).toLocaleDateString('cs-CZ', { day: '2-digit', month: '2-digit' }),
+      date: formatDate(w.date),
       volume: w.exercises.reduce((sum, ex) =>
         sum + ex.sets.reduce((s, set) => s + (set.weight * set.reps), 0), 0
       )
+    }));
+
+  const cardioCaloriesData = cardioWorkouts
+    .filter(last30)
+    .map(w => ({
+      date: formatDate(w.date),
+      calories: w.calories
     }));
 
   return (
@@ -156,7 +166,8 @@ export const WorkoutTracker = () => {
               strengthWorkouts={strengthWorkouts.length}
               cardioWorkouts={cardioWorkouts.length}
               workoutStreak={workoutStreak}
-              volumeData={strengthVolumeData}
+              strengthData={strengthVolumeData}
+              cardioData={cardioCaloriesData}
               />
             )}
 

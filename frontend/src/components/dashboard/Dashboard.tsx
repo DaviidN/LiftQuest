@@ -7,14 +7,16 @@ interface DashboardProps {
   strengthWorkouts: number;
   cardioWorkouts: number;
   workoutStreak: {current: number, best: number};
-  volumeData: Array<{ date: string; volume: number }>;
+  strengthData: Array<{ date: string; volume: number }>;
+  cardioData: Array<{ date: string; calories: number }>;
 }
 
 export const Dashboard: React.FC<DashboardProps> = ({
   strengthWorkouts,
   cardioWorkouts,
   workoutStreak,
-  volumeData
+  strengthData,
+  cardioData
 }) => {
   return (
     <>
@@ -38,7 +40,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
           iconColor="text-orange-400"
         />
       </div>
-      <VolumeChart data={volumeData} />
+      <VolumeChart strengthData={strengthData} cardioData={cardioData} />
     </>
   );
 };
