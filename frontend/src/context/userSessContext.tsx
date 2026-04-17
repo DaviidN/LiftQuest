@@ -55,12 +55,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         loadSession();
     }, []);
 
-    const safeSetUserSess = (val: Session | undefined) => {
-        requestAnimationFrame(() => {
-            setUserSess(val);
-        });
-    };
-
     // Save to localStorage whenever userSess changes
     useEffect(() => {
         if (userSess) {
@@ -71,7 +65,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }, [userSess]);
 
     return (
-        <AuthContext.Provider value={{ userSess, setUserSess: safeSetUserSess, isLoading }}>
+        <AuthContext.Provider value={{ userSess, setUserSess, isLoading }}>
             {children}
         </AuthContext.Provider>
     );

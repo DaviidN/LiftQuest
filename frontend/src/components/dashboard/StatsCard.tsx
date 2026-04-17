@@ -9,7 +9,7 @@ interface StatsCardProps {
 }
 
 export const StatsCard: React.FC<StatsCardProps> = ({ icon: Icon, label, value, iconColor }) => {
-  const isStreak = typeof value === 'object';
+  const isStreak = value !== null && typeof value === 'object';
 
   return (
     <div className="bg-white/10 backdrop-blur-lg rounded-xl p-6">

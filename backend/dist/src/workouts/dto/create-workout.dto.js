@@ -33,7 +33,7 @@ class ExerciseDto {
     sets;
 }
 __decorate([
-    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsIn)(['Squat', 'Bench Press', 'Deadlift']),
     __metadata("design:type", String)
 ], ExerciseDto.prototype, "name", void 0);
 __decorate([
@@ -57,7 +57,7 @@ __decorate([
     __metadata("design:type", String)
 ], CreateWorkoutDto.prototype, "date", void 0);
 __decorate([
-    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsIn)(['strength', 'cardio']),
     __metadata("design:type", String)
 ], CreateWorkoutDto.prototype, "type", void 0);
 __decorate([

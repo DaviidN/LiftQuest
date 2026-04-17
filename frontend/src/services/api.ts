@@ -1,3 +1,5 @@
+import type { Workout } from '../types/workout.types';
+
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
 
 // Types
@@ -179,7 +181,7 @@ export const api = {
     return handleResponse(response, 'Failed to get workouts');
   },
 
-  async createWorkout(workout: any) {
+  async createWorkout(workout: Workout) {
     const token = getAuthToken();
     const response = await fetch(`${API_URL}/workouts`, {
       method: 'POST',

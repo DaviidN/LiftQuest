@@ -99,15 +99,16 @@ let AchievementsService = class AchievementsService {
         let streak = 0;
         if (workouts.length > 0) {
             const sorted = [...workouts].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+            streak = 1;
             let lastDate = new Date(sorted[0].date);
-            for (const workout of sorted) {
-                const workoutDate = new Date(workout.date);
+            for (let i = 1; i < sorted.length; i++) {
+                const workoutDate = new Date(sorted[i].date);
                 const diff = Math.floor((lastDate.getTime() - workoutDate.getTime()) / (1000 * 60 * 60 * 24));
-                if (diff <= 1) {
+                if (diff === 1) {
                     streak++;
                     lastDate = workoutDate;
                 }
-                else {
+                else if (diff > 1) {
                     break;
                 }
             }

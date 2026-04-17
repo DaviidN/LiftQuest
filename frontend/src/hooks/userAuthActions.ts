@@ -3,6 +3,16 @@ import { api } from '../services/api';
 import type { Workout } from '../types/workout.types';
 import type { Session } from '../context/userSessContext';
 
+interface UserAchievement {
+  achievement: {
+    code: string;
+    name: string;
+    description: string;
+    icon: string;
+    xp: number;
+  };
+}
+
 export const useAuthActions = () => {
     const { userSess, setUserSess } = useAuth();
 
@@ -25,7 +35,7 @@ export const useAuthActions = () => {
             workouts: workouts,
             totalXP: response.user.totalXP,
             isEmailVerified: response.user.isEmailVerified,
-            unlockedAchievements: userAchievements.map((ua: any) => ua.achievement.code),
+            unlockedAchievements: userAchievements.map((ua: UserAchievement) => ua.achievement.code),
         };
 
         setUserSess(session);
@@ -60,8 +70,14 @@ export const useAuthActions = () => {
 
     const addWorkout = async (workout: Workout) => {
         const newWorkout = await api.createWorkout(workout);
-        // Check for new achievements
-        const unlockedAchievements = await api.checkAchievements();
+
+        // Check for new achievements — non-critical, don't let it block the workout save
+        let unlockedAchievements: string[] = [];
+        try {
+            unlockedAchievements = await api.checkAchievements();
+        } catch {
+            console.error('Failed to check achievements');
+        }
 
         // Fetch updated data
         const [profile, workouts, userAchievements] = await Promise.all([
@@ -71,13 +87,13 @@ export const useAuthActions = () => {
         ]);
 
         if (userSess) {
-        const updatedSession: Session = {
-            ...userSess,
-            workouts: workouts,
-            totalXP: profile.totalXP,
-            unlockedAchievements: userAchievements.map((ua: any) => ua.achievement.code),
-        };
-        setUserSess(updatedSession);
+            const updatedSession: Session = {
+                ...userSess,
+                workouts: workouts,
+                totalXP: profile.totalXP,
+                unlockedAchievements: userAchievements.map((ua: UserAchievement) => ua.achievement.code),
+            };
+            setUserSess(updatedSession);
         }
 
         return { newWorkout, unlockedAchievements };

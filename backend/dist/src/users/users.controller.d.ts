@@ -10,8 +10,8 @@ export declare class UsersController {
         message: string;
     }>;
     getProfile(req: any): Promise<{
-        email: string;
         id: string;
+        email: string;
         username: string;
         totalXP: number;
         createdAt: Date;

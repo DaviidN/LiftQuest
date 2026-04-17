@@ -9,9 +9,9 @@ export declare class WorkoutsService {
         exercises: ({
             sets: {
                 id: string;
+                exerciseId: string;
                 weight: number;
                 reps: number;
-                exerciseId: string;
             }[];
         } & {
             id: string;
@@ -20,23 +20,23 @@ export declare class WorkoutsService {
         })[];
     } & {
         id: string;
+        createdAt: Date;
+        userId: string;
         date: Date;
         type: string;
         xpEarned: number;
-        createdAt: Date;
         prAchieved: boolean;
         time: number | null;
         calories: number | null;
         distance: number | null;
-        userId: string;
     }>;
     findAll(userId: string): Promise<({
         exercises: ({
             sets: {
                 id: string;
+                exerciseId: string;
                 weight: number;
                 reps: number;
-                exerciseId: string;
             }[];
         } & {
             id: string;
@@ -45,23 +45,23 @@ export declare class WorkoutsService {
         })[];
     } & {
         id: string;
+        createdAt: Date;
+        userId: string;
         date: Date;
         type: string;
         xpEarned: number;
-        createdAt: Date;
         prAchieved: boolean;
         time: number | null;
         calories: number | null;
         distance: number | null;
-        userId: string;
     })[]>;
     findOne(userId: string, workoutId: string): Promise<({
         exercises: ({
             sets: {
                 id: string;
+                exerciseId: string;
                 weight: number;
                 reps: number;
-                exerciseId: string;
             }[];
         } & {
             id: string;
@@ -70,15 +70,15 @@ export declare class WorkoutsService {
         })[];
     } & {
         id: string;
+        createdAt: Date;
+        userId: string;
         date: Date;
         type: string;
         xpEarned: number;
-        createdAt: Date;
         prAchieved: boolean;
         time: number | null;
         calories: number | null;
         distance: number | null;
-        userId: string;
     }) | null>;
     delete(userId: string, workoutId: string): Promise<{
         deleted: boolean;

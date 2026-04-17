@@ -21,7 +21,7 @@ import { SettingsModal } from '../components/user/SettingsModal';
 import { useAuthActions } from '../hooks/userAuthActions';
 
 export const WorkoutTracker = () => {
-  const [achievements, setAchievements] = useState<any[]>([]);
+  const [achievements, setAchievements] = useState<{ code: string; name: string; icon: string }[]>([]);
   const [showAddWorkout, setShowAddWorkout] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showAccountModal, setShowAccountModal] = useState(false);

@@ -1,4 +1,4 @@
-import { IsString, IsDateString, IsArray, IsNumber, IsOptional, ValidateNested, IsBoolean, Min, Max } from 'class-validator';
+import { IsString, IsDateString, IsArray, IsNumber, IsOptional, ValidateNested, IsBoolean, Min, Max, IsIn } from 'class-validator';
 import { Type } from 'class-transformer';
 
 class SetDto {
@@ -14,7 +14,7 @@ class SetDto {
 }
 
 class ExerciseDto {
-  @IsString()
+  @IsIn(['Squat', 'Bench Press', 'Deadlift'])
   name: string;
 
   @IsArray()
@@ -27,8 +27,8 @@ export class CreateWorkoutDto {
   @IsDateString()
   date: string;
 
-  @IsString()
-  type: string; // 'strength' or 'cardio'
+  @IsIn(['strength', 'cardio'])
+  type: string;
 
   // For strength workouts
   @IsOptional()
