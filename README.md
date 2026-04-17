@@ -19,6 +19,7 @@ Track your strength training and cardio workouts while earning XP, leveling up, 
 - Prisma ORM
 - JWT Authentication
 - bcrypt
+- Brevo
 
 **Deployment:**
 - Railway (full-stack hosting)
