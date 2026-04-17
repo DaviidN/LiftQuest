@@ -21,6 +21,30 @@ let WorkoutsService = class WorkoutsService {
         this.usersService = usersService;
     }
     async create(userId, dto) {
+        const now = new Date();
+        const todayStr = now.toISOString().split('T')[0];
+        const minPastDate = new Date(now);
+        minPastDate.setDate(now.getDate() - 7);
+        const minPastStr = minPastDate.toISOString().split('T')[0];
+        if (dto.date > todayStr) {
+            throw new common_1.BadRequestException('Workout date cannot be in the future.');
+        }
+        if (dto.date < minPastStr) {
+            throw new common_1.BadRequestException('Workout date cannot be more than 7 days in the past.');
+        }
+        const dayStart = new Date(dto.date);
+        dayStart.setHours(0, 0, 0, 0);
+        const dayEnd = new Date(dto.date);
+        dayEnd.setHours(23, 59, 59, 999);
+        const workoutsToday = await this.prisma.workout.count({
+            where: {
+                userId,
+                date: { gte: dayStart, lte: dayEnd },
+            },
+        });
+        if (workoutsToday >= 5) {
+            throw new common_1.BadRequestException('You can log a maximum of 5 workouts per day.');
+        }
         let xpEarned = 0;
         let newPR = false;
         if (dto.type === 'strength' && dto.exercises) {
@@ -68,8 +92,8 @@ let WorkoutsService = class WorkoutsService {
         }
         else {
             const calPerMin = dto.calories / (dto.time / 60);
-            const airBikeXP = dto.calories * 0.5 + calPerMin * 5 + dto.time * 0.2;
-            xpEarned = Math.floor(airBikeXP / 10);
+            const cardioXP = dto.calories * 0.5 + calPerMin * 5 + dto.time * 0.2;
+            xpEarned = Math.floor(cardioXP / 10);
         }
         const workout = await this.prisma.workout.create({
             data: {

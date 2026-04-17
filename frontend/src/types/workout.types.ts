@@ -17,9 +17,9 @@ export type StrengthWorkout = {
   prAchieved?: boolean;
 };
 
-export type AirbikeWorkout = {
+export type CardioWorkout = {
   id?: number;
-  type: 'airbike';
+  type: 'cardio';
   date: string;
   time: number;
   calories: number;
@@ -27,4 +27,4 @@ export type AirbikeWorkout = {
   xpEarned?: number;
 };
 
-export type Workout = StrengthWorkout | AirbikeWorkout;
+export type Workout = StrengthWorkout | CardioWorkout;

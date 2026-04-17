@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useState } from "react";
+ import { setUnauthorizedHandler } from '../services/api';
 import type { Workout } from '../types/workout.types';
 
 export interface Session {
@@ -25,13 +26,23 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
+        setUnauthorizedHandler(() => setUserSess(undefined));
+
         const loadSession = async () => {
             const token = localStorage.getItem("authToken");
             const storedSession = localStorage.getItem("session");
-            
+
             if (token && storedSession) {
                 try {
-                    setUserSess(JSON.parse(storedSession));
+                    const payload = JSON.parse(atob(token.split('.')[1]));
+                    const isExpired = payload.exp * 1000 < Date.now();
+
+                    if (isExpired) {
+                        localStorage.removeItem("authToken");
+                        localStorage.removeItem("session");
+                    } else {
+                        setUserSess(JSON.parse(storedSession));
+                    }
                 } catch (error) {
                     console.error("Failed to parse session:", error);
                     localStorage.removeItem("authToken");

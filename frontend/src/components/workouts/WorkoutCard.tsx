@@ -19,7 +19,7 @@ export const WorkoutCard: React.FC<WorkoutCardProps> = ({ workout, calculate1RM 
               <Activity size={20} className="text-pink-400" />
             )}
             <span className="font-bold">
-              {workout.type === 'strength' ? 'Strength Workout' : 'Airbike'}
+              {workout.type === 'strength' ? 'Strength Workout' : 'Cardio'}
             </span>
           </div>
           <div className="text-sm text-slate-400">
@@ -47,7 +47,7 @@ export const WorkoutCard: React.FC<WorkoutCardProps> = ({ workout, calculate1RM 
         </div>
       ))}
       
-      {workout.type === 'airbike' && (
+      {workout.type === 'cardio' && (
         <div className="grid grid-cols-3 gap-4 text-sm">
           <div>
             <div className="text-slate-400">Time</div>

@@ -35,12 +35,12 @@ model Workout {
   id        String   @id @default(uuid())
   userId    String
   date      DateTime
-  type      String   // 'strength' or 'airbike'
+  type      String   // 'strength' or 'cardio'
   xpEarned  Int      @default(0)
   createdAt DateTime @default(now())
   prAchieved Boolean @default(false)
 
-  // For airbike workouts
+  // For cardio workouts
   time      Int?
   calories  Int?
   distance  Float?

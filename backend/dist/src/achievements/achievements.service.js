@@ -20,7 +20,7 @@ const ACHIEVEMENTS = [
     { code: 'PR_MADNESS', name: 'PR Madness', description: '5 new PRs in a month', icon: '🏆', xp: 500 },
     { code: 'STREAK_7', name: 'On Fire', description: '7 days in a row', icon: '🔥', xp: 250 },
     { code: 'TOTAL_100', name: 'Century', description: '100 workouts total', icon: '💯', xp: 10000 },
-    { code: 'AIRBIKE_BEAST', name: 'Cardio King', description: '10 airbike workouts', icon: '🚴', xp: 400 },
+    { code: 'CARDIO_BEAST', name: 'Cardio King', description: '10 cardio workouts', icon: '🚴', xp: 400 },
 ];
 let AchievementsService = class AchievementsService {
     prisma;
@@ -91,10 +91,10 @@ let AchievementsService = class AchievementsService {
             await this.unlockAchievement(userId, 'TOTAL_100');
             unlocked.push('TOTAL_100');
         }
-        const airbikeCount = workouts.filter(w => w.type === 'airbike').length;
-        if (airbikeCount >= 10 && !unlockedCodes.includes('AIRBIKE_BEAST')) {
-            await this.unlockAchievement(userId, 'AIRBIKE_BEAST');
-            unlocked.push('AIRBIKE_BEAST');
+        const cardioCount = workouts.filter(w => w.type === 'cardio').length;
+        if (cardioCount >= 10 && !unlockedCodes.includes('CARDIO_BEAST')) {
+            await this.unlockAchievement(userId, 'CARDIO_BEAST');
+            unlocked.push('CARDIO_BEAST');
         }
         let streak = 0;
         if (workouts.length > 0) {

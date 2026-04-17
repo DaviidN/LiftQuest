@@ -100,7 +100,7 @@ let UsersService = class UsersService {
             orderBy: { date: 'desc' },
         });
         const strengthWorkouts = workouts.filter(w => w.type === 'strength');
-        const airbikeWorkouts = workouts.filter(w => w.type === 'airbike');
+        const cardioWorkouts = workouts.filter(w => w.type === 'cardio');
         let currentStreak = 0;
         if (workouts.length > 0) {
             const sorted = [...workouts].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
@@ -120,7 +120,7 @@ let UsersService = class UsersService {
         return {
             totalWorkouts: workouts.length,
             strengthWorkouts: strengthWorkouts.length,
-            airbikeWorkouts: airbikeWorkouts.length,
+            cardioWorkouts: cardioWorkouts.length,
             currentStreak,
         };
     }
@@ -235,7 +235,7 @@ let UsersService = class UsersService {
             where: { email },
         });
         if (!user) {
-            return;
+            return { message: 'If that email exists, a reset link has been sent.' };
         }
         const resetToken = (0, crypto_1.randomUUID)();
         const resetExpires = new Date(Date.now() + 60 * 60 * 1000);

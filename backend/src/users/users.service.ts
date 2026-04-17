@@ -59,7 +59,7 @@ export class UsersService {
     });
 
     const strengthWorkouts = workouts.filter(w => w.type === 'strength');
-    const airbikeWorkouts = workouts.filter(w => w.type === 'airbike');
+    const cardioWorkouts = workouts.filter(w => w.type === 'cardio');
 
     // Calculate current streak
     let currentStreak = 0;
@@ -84,7 +84,7 @@ export class UsersService {
     return {
       totalWorkouts: workouts.length,
       strengthWorkouts: strengthWorkouts.length,
-      airbikeWorkouts: airbikeWorkouts.length,
+      cardioWorkouts: cardioWorkouts.length,
       currentStreak,
     };
 

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, BadRequestException } from '@nestjs/common';
 import { PrismaService } from 'prisma/prisma.service';
 import { UsersService } from '../users/users.service';
 import { CreateWorkoutDto } from './dto/create-workout.dto';
@@ -11,6 +11,37 @@ export class WorkoutsService {
   ) {}
 
   async create(userId: string, dto: CreateWorkoutDto) {
+    // Date validation
+    const now = new Date();
+    const todayStr = now.toISOString().split('T')[0];
+    const minPastDate = new Date(now);
+    minPastDate.setDate(now.getDate() - 7);
+    const minPastStr = minPastDate.toISOString().split('T')[0];
+
+    if (dto.date > todayStr) {
+      throw new BadRequestException('Workout date cannot be in the future.');
+    }
+    if (dto.date < minPastStr) {
+      throw new BadRequestException('Workout date cannot be more than 7 days in the past.');
+    }
+
+    // Rate limit: max 5 workouts per day
+    const dayStart = new Date(dto.date);
+    dayStart.setHours(0, 0, 0, 0);
+    const dayEnd = new Date(dto.date);
+    dayEnd.setHours(23, 59, 59, 999);
+
+    const workoutsToday = await this.prisma.workout.count({
+      where: {
+        userId,
+        date: { gte: dayStart, lte: dayEnd },
+      },
+    });
+
+    if (workoutsToday >= 5) {
+      throw new BadRequestException('You can log a maximum of 5 workouts per day.');
+    }
+
     // Calculate XP
     let xpEarned = 0; // Base XP
     let newPR = false; 
@@ -70,10 +101,10 @@ export class WorkoutsService {
       }
     }
     } else {
-      // Airbike XP based on calories, time, and intensity
+      // Cardio XP based on calories, time, and intensity
       const calPerMin = dto.calories! / (dto.time! / 60);
-      const airBikeXP = dto.calories! * 0.5 + calPerMin * 5 + dto.time! * 0.2;
-      xpEarned = Math.floor(airBikeXP / 10); // Scale down for balance
+      const cardioXP = dto.calories! * 0.5 + calPerMin * 5 + dto.time! * 0.2;
+      xpEarned = Math.floor(cardioXP / 10); // Scale down for balance
     }
 
     // Create workout

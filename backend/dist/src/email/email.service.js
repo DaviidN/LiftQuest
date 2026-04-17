@@ -12,24 +12,27 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.EmailService = void 0;
 const common_1 = require("@nestjs/common");
 const config_1 = require("@nestjs/config");
-const resend_1 = require("resend");
+const brevo_1 = require("@getbrevo/brevo");
 let EmailService = class EmailService {
     configService;
-    resend;
+    client;
     from;
     constructor(configService) {
         this.configService = configService;
-        this.resend = new resend_1.Resend(this.configService.get('RESEND_API_KEY'));
-        this.from = this.configService.get('SMTP_FROM') || 'LiftQuest <onboarding@resend.dev>';
+        this.client = new brevo_1.BrevoClient({
+            apiKey: () => this.configService.get('BREVO_API_KEY') ?? '',
+            environment: brevo_1.BrevoEnvironment.Default,
+        });
+        this.from = this.configService.get('SMTP_FROM') || 'noreply.liftquest@gmail.com';
     }
     async sendPasswordResetEmail(email, username, token) {
         const frontendUrl = this.configService.get('FRONTEND_URL') || 'http://localhost:8080';
         const resetUrl = `${frontendUrl}/update-user?field=password_reset&token=${token}`;
-        await this.resend.emails.send({
-            from: this.from,
-            to: email,
+        await this.client.transactionalEmails.sendTransacEmail({
+            sender: { email: this.from, name: 'LiftQuest' },
+            to: [{ email }],
             subject: 'Reset your LiftQuest password',
-            html: `
+            htmlContent: `
         <!DOCTYPE html>
         <html>
         <head>
@@ -92,11 +95,11 @@ let EmailService = class EmailService {
         const footerNote = isUpdate
             ? "If you didn't request an email change, you can safely ignore this email. Your account remains unchanged."
             : "If you didn't create an account with LiftQuest, you can safely ignore this email.";
-        await this.resend.emails.send({
-            from: this.from,
-            to: email,
+        await this.client.transactionalEmails.sendTransacEmail({
+            sender: { email: this.from, name: 'LiftQuest' },
+            to: [{ email }],
             subject,
-            html: `
+            htmlContent: `
         <!DOCTYPE html>
         <html>
         <head>

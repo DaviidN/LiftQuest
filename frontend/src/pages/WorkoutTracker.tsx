@@ -80,7 +80,7 @@ export const WorkoutTracker = () => {
 
   const workouts = userSess?.workouts || [];
   const strengthWorkouts = workouts.filter(w => w.type === 'strength');
-  const airbikeWorkouts = workouts.filter(w => w.type === 'airbike');
+  const cardioWorkouts = workouts.filter(w => w.type === 'cardio');
 
   const currentStreak = (() => {
     if (workouts.length === 0) return 0;
@@ -155,7 +155,7 @@ export const WorkoutTracker = () => {
             {activeTab === 'dashboard' && (
               <Dashboard
               strengthWorkouts={strengthWorkouts.length}
-              airbikeWorkouts={airbikeWorkouts.length}
+              cardioWorkouts={cardioWorkouts.length}
               currentStreak={currentStreak}
               volumeData={volumeData}
               />

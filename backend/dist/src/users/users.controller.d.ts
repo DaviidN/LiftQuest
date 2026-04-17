@@ -5,13 +5,13 @@ export declare class UsersController {
     constructor(usersService: UsersService);
     requestEmail(email: string): Promise<{
         message: string;
-    } | undefined>;
+    }>;
     resetPassword(token: string, { newPassword }: UpdatePasswordDto): Promise<{
         message: string;
     }>;
     getProfile(req: any): Promise<{
-        id: string;
         email: string;
+        id: string;
         username: string;
         totalXP: number;
         createdAt: Date;
@@ -23,7 +23,7 @@ export declare class UsersController {
     getStats(req: any): Promise<{
         totalWorkouts: number;
         strengthWorkouts: number;
-        airbikeWorkouts: number;
+        cardioWorkouts: number;
         currentStreak: number;
     }>;
     updateEmail(req: any, email: string, currentPassword: string): Promise<{

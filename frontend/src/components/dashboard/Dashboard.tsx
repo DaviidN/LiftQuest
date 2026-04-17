@@ -5,14 +5,14 @@ import { VolumeChart } from './VolumeChart';
 
 interface DashboardProps {
   strengthWorkouts: number;
-  airbikeWorkouts: number;
+  cardioWorkouts: number;
   currentStreak: number;
   volumeData: Array<{ date: string; volume: number }>;
 }
 
 export const Dashboard: React.FC<DashboardProps> = ({
   strengthWorkouts,
-  airbikeWorkouts,
+  cardioWorkouts,
   currentStreak,
   volumeData
 }) => {
@@ -27,8 +27,8 @@ export const Dashboard: React.FC<DashboardProps> = ({
         />
         <StatsCard
           icon={Activity}
-          label="Airbike"
-          value={airbikeWorkouts}
+          label="Cardio"
+          value={cardioWorkouts}
           iconColor="text-pink-400"
         />
         <StatsCard

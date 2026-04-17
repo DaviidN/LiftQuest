@@ -9,7 +9,7 @@ interface WorkoutListProps {
   calculate1RM: (weight: number, reps: number) => number;
 }
 
-type TypeFilter = 'all' | 'strength' | 'airbike';
+type TypeFilter = 'all' | 'strength' | 'cardio';
 type ExerciseFilter = 'all' | 'Squat' | 'Bench Press' | 'Deadlift';
 
 export const WorkoutList: React.FC<WorkoutListProps> = ({ workouts, calculate1RM }) => {
@@ -38,7 +38,7 @@ export const WorkoutList: React.FC<WorkoutListProps> = ({ workouts, calculate1RM
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap gap-2">
-        {(['all', 'strength', 'airbike'] as TypeFilter[]).map(type => (
+        {(['all', 'strength', 'cardio'] as TypeFilter[]).map(type => (
           <Button
             key={type}
             size="sm"

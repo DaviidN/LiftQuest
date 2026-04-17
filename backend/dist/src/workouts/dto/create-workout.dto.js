@@ -18,10 +18,14 @@ class SetDto {
 }
 __decorate([
     (0, class_validator_1.IsNumber)(),
+    (0, class_validator_1.Min)(0),
+    (0, class_validator_1.Max)(300),
     __metadata("design:type", Number)
 ], SetDto.prototype, "weight", void 0);
 __decorate([
     (0, class_validator_1.IsNumber)(),
+    (0, class_validator_1.Min)(1),
+    (0, class_validator_1.Max)(50),
     __metadata("design:type", Number)
 ], SetDto.prototype, "reps", void 0);
 class ExerciseDto {
@@ -66,16 +70,22 @@ __decorate([
 __decorate([
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsNumber)(),
+    (0, class_validator_1.Min)(1),
+    (0, class_validator_1.Max)(300),
     __metadata("design:type", Number)
 ], CreateWorkoutDto.prototype, "time", void 0);
 __decorate([
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsNumber)(),
+    (0, class_validator_1.Min)(1),
+    (0, class_validator_1.Max)(2000),
     __metadata("design:type", Number)
 ], CreateWorkoutDto.prototype, "calories", void 0);
 __decorate([
     (0, class_validator_1.IsOptional)(),
     (0, class_validator_1.IsNumber)(),
+    (0, class_validator_1.Min)(0),
+    (0, class_validator_1.Max)(200),
     __metadata("design:type", Number)
 ], CreateWorkoutDto.prototype, "distance", void 0);
 __decorate([

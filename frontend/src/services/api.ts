@@ -36,8 +36,33 @@ export interface UserProfile {
   };
 }
 
+let onUnauthorized: () => void = () => {};  
+
+export const setUnauthorizedHandler = (fn: () => void) => {                                                                                               
+  onUnauthorized = fn;
+};
+
+const handleLogout = () => {
+  localStorage.removeItem("authToken");
+  localStorage.removeItem("session");
+  onUnauthorized();
+};
+
 // Get auth token from localStorage
 const getAuthToken = () => localStorage.getItem('authToken');
+
+const handleResponse = async (response: Response, defaultMessage: string) => {
+  if (!response.ok) {
+    if (response.status === 401) {
+      const error = await response.json();
+      handleLogout();
+      throw new Error(error.message);
+    }
+    const error = await response.json().catch(() => ({}));
+    throw new Error(error.message || defaultMessage);
+  }
+  return response.json();
+};
 
 // API calls
 export const api = {
@@ -80,101 +105,58 @@ export const api = {
   async getProfile(): Promise<UserProfile> {
     const token = getAuthToken();
     const response = await fetch(`${API_URL}/users/profile`, {
-      headers: {
-        'Authorization': `Bearer ${token}`,
-      },
+      headers: { 'Authorization': `Bearer ${token}` },
     });
-
-    if (!response.ok) {
-      throw new Error('Failed to get profile');
-    }
-
-    return response.json();
+    return handleResponse(response, 'Failed to get profile');
   },
 
   async getStats() {
     const token = getAuthToken();
     const response = await fetch(`${API_URL}/users/stats`, {
-      headers: {
-        'Authorization': `Bearer ${token}`,
-      },
+      headers: { 'Authorization': `Bearer ${token}` },
     });
-
-    if (!response.ok) {
-      throw new Error('Failed to get stats');
-    }
-
-    return response.json();
+    return handleResponse(response, 'Failed to get stats');
   },
 
-    async deleteProfile() {
+  async deleteProfile() {
     const token = getAuthToken();
     const response = await fetch(`${API_URL}/users/delete`, {
       method: 'DELETE',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-      },
+      headers: { 'Authorization': `Bearer ${token}` },
     });
-
-    if (!response.ok) {
-      throw new Error('Failed to delete profile');
-    }
-      
-    return response.json();
+    return handleResponse(response, 'Failed to delete profile');
   },
 
-    async updateEmail(currentPassword: string,email: string) {
+  async updateEmail(currentPassword: string, email: string) {
     const token = getAuthToken();
     const response = await fetch(`${API_URL}/users/email`, {
       method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
-      },
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
       body: JSON.stringify({ email, currentPassword }),
     });
-
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.message || 'Failed to update email');
-    }
-
-    return response.json();
+    return handleResponse(response, 'Failed to update email');
   },
 
   async updateUsername(username: string) {
     const token = getAuthToken();
     const response = await fetch(`${API_URL}/users/username`, {
       method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
-      },
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
       body: JSON.stringify({ username }),
     });
-
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.message || 'Failed to change username');
-    }
-
-    return response.json();
+    return handleResponse(response, 'Failed to change username');
   },
 
-  async resetPassword(newPassword: string, token: string){
+  async resetPassword(newPassword: string, token: string) {
     const response = await fetch(`${API_URL}/users/reset-password?token=${token}`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ newPassword }),
     });
-
     if (!response.ok) {
       const error = await response.json();
-      throw new Error(error.message || 'Email verification failed');
+      throw new Error(error.message || 'Password reset failed');
     }
-
     return response.json();
   },
 
@@ -182,126 +164,70 @@ export const api = {
     const token = getAuthToken();
     const response = await fetch(`${API_URL}/users/password`, {
       method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
-      },
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
       body: JSON.stringify({ currentPassword, newPassword }),
     });
-
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.message || 'Failed to update password');
-    }
-
-    return response.json();
+    return handleResponse(response, 'Failed to update password');
   },
 
   // Workouts
   async getWorkouts() {
     const token = getAuthToken();
     const response = await fetch(`${API_URL}/workouts`, {
-      headers: {
-        'Authorization': `Bearer ${token}`,
-      },
+      headers: { 'Authorization': `Bearer ${token}` },
     });
-
-    if (!response.ok) {
-      throw new Error('Failed to get workouts');
-    }
-
-    return response.json();
+    return handleResponse(response, 'Failed to get workouts');
   },
 
   async createWorkout(workout: any) {
     const token = getAuthToken();
     const response = await fetch(`${API_URL}/workouts`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
-      },
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
       body: JSON.stringify(workout),
     });
-
-    if (!response.ok) {
-      throw new Error('Failed to create workout');
-    }
-
-    return response.json();
+    return handleResponse(response, 'Failed to create workout');
   },
 
   async deleteWorkout(workoutId: string) {
     const token = getAuthToken();
     const response = await fetch(`${API_URL}/workouts/${workoutId}`, {
       method: 'DELETE',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-      },
+      headers: { 'Authorization': `Bearer ${token}` },
     });
-
-    if (!response.ok) {
-      throw new Error('Failed to delete workout');
-    }
-
-    return response.json();
+    return handleResponse(response, 'Failed to delete workout');
   },
 
   async getVolumeData(days: number = 30) {
     const token = getAuthToken();
     const response = await fetch(`${API_URL}/workouts/volume?days=${days}`, {
-      headers: {
-        'Authorization': `Bearer ${token}`,
-      },
+      headers: { 'Authorization': `Bearer ${token}` },
     });
-
-    if (!response.ok) {
-      throw new Error('Failed to get volume data');
-    }
-
-    return response.json();
+    return handleResponse(response, 'Failed to get volume data');
   },
 
   // Achievements
   async getAchievements() {
     const response = await fetch(`${API_URL}/achievements`);
-
-    if (!response.ok) {
-      throw new Error('Failed to get achievements');
-    }
-
+    if (!response.ok) throw new Error('Failed to get achievements');
     return response.json();
   },
 
   async getUserAchievements() {
     const token = getAuthToken();
     const response = await fetch(`${API_URL}/achievements/user`, {
-      headers: {
-        'Authorization': `Bearer ${token}`,
-      },
+      headers: { 'Authorization': `Bearer ${token}` },
     });
-
-    if (!response.ok) {
-      throw new Error('Failed to get user achievements');
-    }
-
-    return response.json();
+    return handleResponse(response, 'Failed to get user achievements');
   },
 
   async checkAchievements() {
     const token = getAuthToken();
     const response = await fetch(`${API_URL}/achievements/check`, {
       method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-      },
+      headers: { 'Authorization': `Bearer ${token}` },
     });
-
-    if (!response.ok) {
-      throw new Error('Failed to check achievements');
-    }
-
-    return response.json();
+    return handleResponse(response, 'Failed to check achievements');
   },
 
   // Email 

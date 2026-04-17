@@ -20,7 +20,7 @@ interface StrengthExercise {
 }
 
 export const AddWorkoutModal: React.FC<AddWorkoutModalProps> = ({ onClose, onAdd }) => {
-  const [workoutType, setWorkoutType] = useState<'strength' | 'airbike'>('strength');
+  const [workoutType, setWorkoutType] = useState<'strength' | 'cardio'>('strength');
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
   const [errorMessage, setErrorMessage] = useState('');
   const [validExercises, setValidExercises] = useState<StrengthExercise[]>([]);
@@ -33,7 +33,7 @@ export const AddWorkoutModal: React.FC<AddWorkoutModalProps> = ({ onClose, onAdd
     { name: 'Squat', sets: [{ weight: '', reps: '' }] }
   ]);
   
-  // Airbike state
+  // Cardio state
   const [time, setTime] = useState('');
   const [calories, setCalories] = useState('');
   const [distance, setDistance] = useState('');
@@ -128,7 +128,7 @@ export const AddWorkoutModal: React.FC<AddWorkoutModalProps> = ({ onClose, onAdd
       }
       
       onAdd({
-        type: 'airbike',
+        type: 'cardio',
         date,
         time: parseInt(time),
         calories: parseInt(calories),
@@ -171,13 +171,13 @@ export const AddWorkoutModal: React.FC<AddWorkoutModalProps> = ({ onClose, onAdd
                   Strength
                 </Button>
                 <Button
-                  variant={workoutType === 'airbike' ? 'primary' : 'secondary'}
-                  onClick={() => setWorkoutType('airbike')}
+                  variant={workoutType === 'cardio' ? 'primary' : 'secondary'}
+                  onClick={() => setWorkoutType('cardio')}
                   size='lg'
                   className={'flex-1 py-2 rounded-lg transition-all'}
                 >
                   <Activity size={20}/>
-                  Airbike
+                  Cardio
                 </Button>
               </div>
             </div>
