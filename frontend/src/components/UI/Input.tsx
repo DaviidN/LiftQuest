@@ -7,6 +7,8 @@ interface InputProps {
   onBlur?: () => void;
   disabled?: boolean;
   placeholder?: string;
+  min?: string;
+  max?: string;
   type?: string;
   auth?: boolean;
   className?: string;
@@ -19,6 +21,8 @@ export const Input: React.FC<InputProps> = ({
   onBlur,
   disabled = false,
   placeholder,
+  min,
+  max,
   type = 'text',
   auth = false,
   className,
@@ -43,6 +47,8 @@ export const Input: React.FC<InputProps> = ({
         type={type}
         {...inputProps}   
         placeholder={placeholder}
+        min={min}
+        max={max}
         value={value}
         disabled={disabled}
         onChange={onChange}

@@ -47,7 +47,7 @@ export const WorkoutTracker = () => {
     }, [userSess]);
 
 
- const handleAddWorkout = async (workout: Workout) => {
+  const handleAddWorkout = async (workout: Workout): Promise<void> => {
     try {
       const result = await addWorkout(workout);
 
@@ -59,7 +59,7 @@ export const WorkoutTracker = () => {
 
       setShowAddWorkout(false);
     } catch (error) {
-      console.error('Failed to add workout:', error);
+      throw error;
     }
   };
 
@@ -82,34 +82,33 @@ export const WorkoutTracker = () => {
   const strengthWorkouts = workouts.filter(w => w.type === 'strength');
   const cardioWorkouts = workouts.filter(w => w.type === 'cardio');
 
-  const currentStreak = (() => {
-    if (workouts.length === 0) return 0;
+  const workoutStreak = (() => {
+    if (workouts.length === 0) return { current: 0, best: 0 };
     const sorted = [...workouts].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-    let streak = 0;
+    let best = 1;
+    let current = 1;
     let lastDate = new Date(sorted[0].date);
 
-    for (let workout of sorted) {
-      const workoutDate = new Date(workout.date);
+    for (let i = 1; i < sorted.length; i++) {
+      const workoutDate = new Date(sorted[i].date);
       const diff = Math.floor((lastDate.getTime() - workoutDate.getTime()) / (1000 * 60 * 60 * 24));
-      if (diff <= 1) {
-        streak++;
+      if (diff === 1) {
+        current++;
+        best = Math.max(best, current);
         lastDate = workoutDate;
-      } else {
+      } else if (diff > 1){
+        lastDate = workoutDate
         break;
       }
     }
-    return streak;
+    return {current, best};
   })();
 
-  const last30Days = workouts
+  const strengthVolumeData = strengthWorkouts
     .filter(w => {
       const diff = Date.now() - new Date(w.date).getTime();
       return diff < 30 * 24 * 60 * 60 * 1000;
     })
-    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
-
-  const volumeData = last30Days
-    .filter(w => w.type === 'strength')
     .map(w => ({
       date: new Date(w.date).toLocaleDateString('cs-CZ', { day: '2-digit', month: '2-digit' }),
       volume: w.exercises.reduce((sum, ex) =>
@@ -156,8 +155,8 @@ export const WorkoutTracker = () => {
               <Dashboard
               strengthWorkouts={strengthWorkouts.length}
               cardioWorkouts={cardioWorkouts.length}
-              currentStreak={currentStreak}
-              volumeData={volumeData}
+              workoutStreak={workoutStreak}
+              volumeData={strengthVolumeData}
               />
             )}
 

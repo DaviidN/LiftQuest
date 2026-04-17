@@ -6,7 +6,7 @@ import { Input } from '../UI/Input';
 
 interface AddWorkoutModalProps {
   onClose: () => void;
-  onAdd: (workout: Workout) => void;
+  onAdd: (workout: Workout) => Promise<void>;
 };
 
 type StrengthExerciseName = 'Squat' | 'Bench Press' | 'Deadlift';
@@ -21,10 +21,16 @@ interface StrengthExercise {
 
 export const AddWorkoutModal: React.FC<AddWorkoutModalProps> = ({ onClose, onAdd }) => {
   const [workoutType, setWorkoutType] = useState<'strength' | 'cardio'>('strength');
-  const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
+  const today = new Date().toISOString().split('T')[0];
+  const minDate = new Date();
+  minDate.setDate(minDate.getDate() - 7);
+  const minDateStr = minDate.toISOString().split('T')[0];
+
+  const [date, setDate] = useState(today);
   const [errorMessage, setErrorMessage] = useState('');
   const [validExercises, setValidExercises] = useState<StrengthExercise[]>([]);
   const [validWorkout, setValidWorkout] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const lastExerciseRef = useRef<HTMLDivElement | null>(null);
 
@@ -98,43 +104,69 @@ export const AddWorkoutModal: React.FC<AddWorkoutModalProps> = ({ onClose, onAdd
     setExercises(newExercises);
   };
 
-  const handleSubmit = () => {
+  const validateDate = () => {
+    const today = new Date().toISOString().split('T')[0];
+    const minDate = new Date();
+    minDate.setDate(minDate.getDate() - 7);
+    const minDateStr = minDate.toISOString().split('T')[0];
+
+    if (date > today) return '* Workout date cannot be in the future.';
+    if (date < minDateStr) return '* Workout date cannot be more than 7 days in the past.';
+    return null;
+  };
+
+  const handleSubmit = async () => {
+    const dateError = validateDate();
+    if (dateError) {
+      setErrorMessage(dateError);
+      return;
+    }
+
     if (workoutType === 'strength') {
       if (!validWorkout) {
-          setErrorMessage('* Please fill in all fields!');
+        setErrorMessage('* Please fill in all fields!');
         return;
       }
       const mappedExercises = validExercises.map(ex => ({
-      ...ex,
-      sets: ex.sets
-        .filter(s => s.weight && s.reps)
-        .map(s => ({
-          weight: parseFloat(s.weight),
-          reps: parseInt(s.reps)
-        }))
-    }));
+        ...ex,
+        sets: ex.sets
+          .filter(s => s.weight && s.reps)
+          .map(s => ({
+            weight: parseFloat(s.weight),
+            reps: parseInt(s.reps)
+          }))
+      }));
 
-
-      onAdd({
-        type: 'strength',
-        date,
-        exercises: mappedExercises
-      });
-      onClose();
+      try {
+        setIsLoading(true);
+        await onAdd({ type: 'strength', date, exercises: mappedExercises });
+        onClose();
+      } catch (error: any) {
+        setErrorMessage(`* ${error.message}`);
+      } finally {
+        setIsLoading(false);
+      }
     } else {
       if (!validWorkout) {
         setErrorMessage('* Please fill in all fields!');
         return;
       }
-      
-      onAdd({
-        type: 'cardio',
-        date,
-        time: parseInt(time),
-        calories: parseInt(calories),
-        distance: parseFloat(distance)
-      });
-      onClose();
+
+      try {
+        setIsLoading(true);
+        await onAdd({
+          type: 'cardio',
+          date,
+          time: parseInt(time),
+          calories: parseInt(calories),
+          distance: parseFloat(distance)
+        });
+        onClose();
+      } catch (error: any) {
+        setErrorMessage(`* ${error.message}`);
+      } finally {
+        setIsLoading(false);
+      }
     }
   };
 
@@ -143,7 +175,7 @@ export const AddWorkoutModal: React.FC<AddWorkoutModalProps> = ({ onClose, onAdd
       <div className="bg-secondary rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-2xl font-bold">New workout</h2>
-            <Button onClick={onClose} variant='secondary'>
+            <Button onClick={onClose} variant='secondary' disabled={isLoading}>
               <X size={20}/>
             </Button>
           </div>
@@ -154,7 +186,10 @@ export const AddWorkoutModal: React.FC<AddWorkoutModalProps> = ({ onClose, onAdd
               <Input
                 type="date"
                 value={date}
+                min={minDateStr}
+                max={today}
                 onChange={(e) => setDate(e.target.value)}
+                className="w-full flex-1 bg-slate-600 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all"
               />
             </div>
 
@@ -240,6 +275,7 @@ export const AddWorkoutModal: React.FC<AddWorkoutModalProps> = ({ onClose, onAdd
                   <Button
                     onClick={addExercise}
                     variant='tertiary'
+                    disabled={isLoading}
                     className={`transition-all duration-300 ${
                       exercises.length > 1 ? "w-1/2" : "w-full"
                     }`}
@@ -252,6 +288,7 @@ export const AddWorkoutModal: React.FC<AddWorkoutModalProps> = ({ onClose, onAdd
                   <Button
                     onClick={() => removeExercise()}
                     variant='secondary'
+                    disabled={isLoading}
                     className='w-1/2'
                   >
                     <span className="sm:hidden">- Remove</span>
@@ -296,6 +333,7 @@ export const AddWorkoutModal: React.FC<AddWorkoutModalProps> = ({ onClose, onAdd
               onClick={onClose}
               className="flex-1"
               size='lg'
+              disabled={isLoading}
             >
               Cancel
             </Button>
@@ -304,9 +342,9 @@ export const AddWorkoutModal: React.FC<AddWorkoutModalProps> = ({ onClose, onAdd
               className="flex-1"
               size='lg'
               variant='primary'
-              disabled={!validWorkout}
+              disabled={!validWorkout || isLoading}
             >
-              Save
+              {isLoading ? 'Saving...' : 'Save'}
             </Button>
           </div>
       </div>

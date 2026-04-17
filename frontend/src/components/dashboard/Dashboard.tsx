@@ -6,14 +6,14 @@ import { VolumeChart } from './VolumeChart';
 interface DashboardProps {
   strengthWorkouts: number;
   cardioWorkouts: number;
-  currentStreak: number;
+  workoutStreak: {current: number, best: number};
   volumeData: Array<{ date: string; volume: number }>;
 }
 
 export const Dashboard: React.FC<DashboardProps> = ({
   strengthWorkouts,
   cardioWorkouts,
-  currentStreak,
+  workoutStreak,
   volumeData
 }) => {
   return (
@@ -34,7 +34,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
         <StatsCard
           icon={Flame}
           label="Current streak"
-          value={currentStreak}
+          value={workoutStreak}
           iconColor="text-orange-400"
         />
       </div>
