@@ -17,8 +17,7 @@ model User {
   username                 String    @unique
   password                 String?
   googleId                 String?   @unique
-  appleId                  String?   @unique
-  provider                 String    @default("local") // "local" | "google" | "apple"
+  provider                 String    @default("local") // "local" | "google"
   avatarUrl                String?
   totalXP                  Int       @default(0)
   isEmailVerified          Boolean   @default(false)

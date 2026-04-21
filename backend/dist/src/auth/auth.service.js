@@ -99,23 +99,19 @@ let AuthService = class AuthService {
         };
     }
     async findOrCreateOAuthUser({ provider, providerId, email, username, avatarUrl }) {
-        let user = provider === 'google'
-            ? await this.prisma.user.findUnique({ where: { googleId: providerId } })
-            : await this.prisma.user.findUnique({ where: { appleId: providerId } });
+        const user = await this.prisma.user.findUnique({ where: { googleId: providerId } });
         if (user)
             return user;
-        user = await this.prisma.user.findUnique({ where: { email } });
-        if (user) {
-            const linkField = provider === 'google' ? { googleId: providerId } : { appleId: providerId };
-            return this.prisma.user.update({ where: { email }, data: linkField });
+        const existingUser = await this.prisma.user.findUnique({ where: { email } });
+        if (existingUser) {
+            return this.prisma.user.update({ where: { email }, data: { googleId: providerId } });
         }
         const safeUsername = await this.generateUniqueUsername(username);
-        const oauthField = provider === 'google' ? { googleId: providerId } : { appleId: providerId };
         return this.prisma.user.create({
             data: {
                 email,
                 username: safeUsername,
-                ...oauthField,
+                googleId: providerId,
                 provider,
                 avatarUrl,
                 isEmailVerified: true,

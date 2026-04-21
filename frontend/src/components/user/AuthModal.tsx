@@ -225,6 +225,12 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               <p className="text-red-400 text-sm mt-1">Password is required</p>
             )}
           </div>
+
+          <div className="flex items-center gap-3 text-gray-500 text-sm">                 
+            <div className="flex-1 h-px bg-slate-700" />                              
+            or                                                                        
+            <div className="flex-1 h-px bg-slate-700" />
+          </div>
           
           <div>
             <Button
