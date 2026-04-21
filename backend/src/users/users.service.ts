@@ -108,6 +108,10 @@ export class UsersService {
       throw new NotFoundException('User does not exist');
     }
 
+    if (!user.password) {
+      throw new UnauthorizedException('Account uses OAuth login');
+    }
+
     const isCurrentPasswordCorrect = await bcrypt.compare(currentPassword, user.password);
 
     if(!isCurrentPasswordCorrect) {
@@ -215,6 +219,10 @@ export class UsersService {
       throw new NotFoundException('User does not exist');
     }
 
+    if (!user.password) {
+      throw new UnauthorizedException('Account uses OAuth login');
+    }
+
     const isCurrentPasswordCorrect = await bcrypt.compare(currentPassword, user.password);
 
     if(!isCurrentPasswordCorrect) {
@@ -276,7 +284,9 @@ export class UsersService {
 
     const hashed = await bcrypt.hash(newPassword, 10);
 
-    const isSamePassword = await bcrypt.compare(newPassword, user.password);
+    const isSamePassword = user.password
+      ? await bcrypt.compare(newPassword, user.password)
+      : false;
 
     if (isSamePassword) {
       throw new ConflictException('New password must be different');

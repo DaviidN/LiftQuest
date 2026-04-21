@@ -98,11 +98,50 @@ let AuthService = class AuthService {
             },
         };
     }
+    async findOrCreateOAuthUser({ provider, providerId, email, username, avatarUrl }) {
+        let user = provider === 'google'
+            ? await this.prisma.user.findUnique({ where: { googleId: providerId } })
+            : await this.prisma.user.findUnique({ where: { appleId: providerId } });
+        if (user)
+            return user;
+        user = await this.prisma.user.findUnique({ where: { email } });
+        if (user) {
+            const linkField = provider === 'google' ? { googleId: providerId } : { appleId: providerId };
+            return this.prisma.user.update({ where: { email }, data: linkField });
+        }
+        const safeUsername = await this.generateUniqueUsername(username);
+        const oauthField = provider === 'google' ? { googleId: providerId } : { appleId: providerId };
+        return this.prisma.user.create({
+            data: {
+                email,
+                username: safeUsername,
+                ...oauthField,
+                provider,
+                avatarUrl,
+                isEmailVerified: true,
+            },
+        });
+    }
+    async generateUniqueUsername(base) {
+        const slug = base.replace(/\s+/g, '').toLowerCase().slice(0, 20);
+        let username = slug;
+        let counter = 1;
+        while (await this.prisma.user.findUnique({ where: { username } })) {
+            username = `${slug}${counter++}`;
+        }
+        return username;
+    }
+    signJwt(user) {
+        return this.jwtService.sign({ sub: user.id, email: user.email });
+    }
     async login(dto) {
         const user = await this.prisma.user.findUnique({
             where: { email: dto.email },
         });
         if (!user) {
+            throw new common_1.UnauthorizedException('Invalid credentials');
+        }
+        if (!user.password) {
             throw new common_1.UnauthorizedException('Invalid credentials');
         }
         const isPasswordValid = await bcrypt.compare(dto.password, user.password);

@@ -3,8 +3,8 @@ export declare class AchievementsController {
     private achievementsService;
     constructor(achievementsService: AchievementsService);
     findAll(): Promise<{
-        id: string;
         name: string;
+        id: string;
         code: string;
         description: string;
         icon: string;
@@ -12,8 +12,8 @@ export declare class AchievementsController {
     }[]>;
     getUserAchievements(req: any): Promise<({
         achievement: {
-            id: string;
             name: string;
+            id: string;
             code: string;
             description: string;
             icon: string;

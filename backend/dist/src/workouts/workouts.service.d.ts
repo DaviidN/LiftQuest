@@ -9,13 +9,13 @@ export declare class WorkoutsService {
         exercises: ({
             sets: {
                 id: string;
-                exerciseId: string;
                 weight: number;
                 reps: number;
+                exerciseId: string;
             }[];
         } & {
-            id: string;
             name: string;
+            id: string;
             workoutId: string;
         })[];
     } & {
@@ -34,13 +34,13 @@ export declare class WorkoutsService {
         exercises: ({
             sets: {
                 id: string;
-                exerciseId: string;
                 weight: number;
                 reps: number;
+                exerciseId: string;
             }[];
         } & {
-            id: string;
             name: string;
+            id: string;
             workoutId: string;
         })[];
     } & {
@@ -59,13 +59,13 @@ export declare class WorkoutsService {
         exercises: ({
             sets: {
                 id: string;
-                exerciseId: string;
                 weight: number;
                 reps: number;
+                exerciseId: string;
             }[];
         } & {
-            id: string;
             name: string;
+            id: string;
             workoutId: string;
         })[];
     } & {

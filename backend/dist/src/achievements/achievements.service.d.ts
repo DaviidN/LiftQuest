@@ -7,8 +7,8 @@ export declare class AchievementsService implements OnModuleInit {
     constructor(prisma: PrismaService, usersService: UsersService);
     onModuleInit(): Promise<void>;
     findAll(): Promise<{
-        id: string;
         name: string;
+        id: string;
         code: string;
         description: string;
         icon: string;
@@ -16,8 +16,8 @@ export declare class AchievementsService implements OnModuleInit {
     }[]>;
     getUserAchievements(userId: string): Promise<({
         achievement: {
-            id: string;
             name: string;
+            id: string;
             code: string;
             description: string;
             icon: string;

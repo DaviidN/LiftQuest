@@ -18,6 +18,35 @@ export declare class AuthService {
             isEmailVerified: boolean;
         };
     }>;
+    findOrCreateOAuthUser({ provider, providerId, email, username, avatarUrl }: {
+        provider: string;
+        providerId: string;
+        email: string;
+        username: string;
+        avatarUrl?: string;
+    }): Promise<{
+        email: string;
+        username: string;
+        password: string | null;
+        id: string;
+        googleId: string | null;
+        appleId: string | null;
+        provider: string;
+        avatarUrl: string | null;
+        totalXP: number;
+        isEmailVerified: boolean;
+        emailVerificationToken: string | null;
+        emailVerificationExpires: Date | null;
+        passwordResetToken: string | null;
+        passwordResetExpires: Date | null;
+        createdAt: Date;
+        updatedAt: Date;
+    }>;
+    private generateUniqueUsername;
+    signJwt(user: {
+        id: string;
+        email: string;
+    }): string;
     login(dto: LoginDto): Promise<{
         token: string;
         user: {

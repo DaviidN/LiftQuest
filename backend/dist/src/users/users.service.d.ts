@@ -7,9 +7,9 @@ export declare class UsersService {
     private emailService;
     constructor(prisma: PrismaService, jwtService: JwtService, emailService: EmailService);
     getProfile(userId: string): Promise<{
-        id: string;
         email: string;
         username: string;
+        id: string;
         totalXP: number;
         createdAt: Date;
         _count: {
@@ -18,10 +18,14 @@ export declare class UsersService {
         };
     } | null>;
     updateXP(userId: string, xpToAdd: number): Promise<{
-        id: string;
         email: string;
         username: string;
-        password: string;
+        password: string | null;
+        id: string;
+        googleId: string | null;
+        appleId: string | null;
+        provider: string;
+        avatarUrl: string | null;
         totalXP: number;
         isEmailVerified: boolean;
         emailVerificationToken: string | null;

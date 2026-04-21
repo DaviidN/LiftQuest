@@ -1,7 +1,9 @@
-import { Controller, Post, Body, Get, Query } from '@nestjs/common';
+import { Controller, Post, Body, Get, Query, UseGuards, Req, Res } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { SignupDto } from './dto/signup.dto';
 import { LoginDto } from './dto/login.dto';
+import { AuthGuard } from '@nestjs/passport';
+import type { Request, Response } from 'express';
 
 @Controller('auth')
 export class AuthController {
@@ -25,5 +27,17 @@ export class AuthController {
   @Post('resend-verification')
   resendVerification(@Body('email') email: string) {
     return this.authService.resendVerificationEmail(email);
+  }
+
+  @Get('google')
+  @UseGuards(AuthGuard('google'))
+  googleLogin() {}
+
+  @Get('google/callback')
+  @UseGuards(AuthGuard('google'))
+  googleCallback(@Req() req: Request, @Res() res: Response) {
+    const token = this.authService.signJwt(req.user as {id: string; email: string; });
+    // Redirect to frontend with token in query param (or use a cookie)
+    res.redirect(`${process.env.FRONTEND_URL}/oauth-callback?token=${token}`);
   }
 }

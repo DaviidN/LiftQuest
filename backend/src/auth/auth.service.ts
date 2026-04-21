@@ -74,6 +74,55 @@ export class AuthService {
     };
   }
 
+  async findOrCreateOAuthUser({ provider, providerId, email, username, avatarUrl }: {
+    provider: string;
+    providerId: string;
+    email: string;
+    username: string;
+    avatarUrl?: string;
+  }) {
+    // Check if user already linked this OAuth account
+    let user = provider === 'google'
+      ? await this.prisma.user.findUnique({ where: { googleId: providerId } })
+      : await this.prisma.user.findUnique({ where: { appleId: providerId } });
+    if (user) return user;
+
+    // Check if email already exists — link the OAuth account to it
+    user = await this.prisma.user.findUnique({ where: { email } });
+    if (user) {
+      const linkField = provider === 'google' ? { googleId: providerId } : { appleId: providerId };
+      return this.prisma.user.update({ where: { email }, data: linkField });
+    }
+
+    // Create new user
+    const safeUsername = await this.generateUniqueUsername(username);
+    const oauthField = provider === 'google' ? { googleId: providerId } : { appleId: providerId };
+    return this.prisma.user.create({
+      data: {
+        email,
+        username: safeUsername,
+        ...oauthField,
+        provider,
+        avatarUrl,
+        isEmailVerified: true,
+      },
+    });
+  }
+
+  private async generateUniqueUsername(base: string): Promise<string> {
+    const slug = base.replace(/\s+/g, '').toLowerCase().slice(0, 20);
+    let username = slug;
+    let counter = 1;
+    while (await this.prisma.user.findUnique({ where: { username } })) {
+      username = `${slug}${counter++}`;
+    }
+    return username;
+  }
+
+  signJwt(user: { id: string; email: string }): string {
+    return this.jwtService.sign({ sub: user.id, email: user.email });
+  }
+
   async login(dto: LoginDto) {
     // Find user
     const user = await this.prisma.user.findUnique({
@@ -85,6 +134,10 @@ export class AuthService {
     }
 
     // Check password
+    if (!user.password) {
+      throw new UnauthorizedException('Invalid credentials');
+    }
+
     const isPasswordValid = await bcrypt.compare(dto.password, user.password);
 
     if (!isPasswordValid) {

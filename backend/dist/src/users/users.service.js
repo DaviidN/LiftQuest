@@ -138,6 +138,9 @@ let UsersService = class UsersService {
         if (!user) {
             throw new common_1.NotFoundException('User does not exist');
         }
+        if (!user.password) {
+            throw new common_1.UnauthorizedException('Account uses OAuth login');
+        }
         const isCurrentPasswordCorrect = await bcrypt.compare(currentPassword, user.password);
         if (!isCurrentPasswordCorrect) {
             throw new common_1.UnauthorizedException('Incorrect password');
@@ -216,6 +219,9 @@ let UsersService = class UsersService {
         if (!user) {
             throw new common_1.NotFoundException('User does not exist');
         }
+        if (!user.password) {
+            throw new common_1.UnauthorizedException('Account uses OAuth login');
+        }
         const isCurrentPasswordCorrect = await bcrypt.compare(currentPassword, user.password);
         if (!isCurrentPasswordCorrect) {
             throw new common_1.UnauthorizedException('Incorrect password');
@@ -261,7 +267,9 @@ let UsersService = class UsersService {
             throw new common_1.UnauthorizedException('Invalid or expired reset token.');
         }
         const hashed = await bcrypt.hash(newPassword, 10);
-        const isSamePassword = await bcrypt.compare(newPassword, user.password);
+        const isSamePassword = user.password
+            ? await bcrypt.compare(newPassword, user.password)
+            : false;
         if (isSamePassword) {
             throw new common_1.ConflictException('New password must be different');
         }
