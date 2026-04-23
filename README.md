@@ -6,6 +6,8 @@ LiftQuest
 
 Track your strength training and cardio workouts while earning XP, leveling up, and unlocking achievements. Built with modern web technologies.
 
+Check it out here: https://liftquest.up.railway.app
+
 ## Tech Stack
 
 **Frontend:**
