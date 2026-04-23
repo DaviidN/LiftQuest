@@ -37,7 +37,6 @@ export class AuthController {
   @UseGuards(AuthGuard('google'))
   googleCallback(@Req() req: Request, @Res() res: Response) {
     const token = this.authService.signJwt(req.user as {id: string; email: string; });
-    // Redirect to frontend with token in query param (or use a cookie)
     res.redirect(`${process.env.FRONTEND_URL}/oauth-callback?token=${token}`);
   }
 }
