@@ -9,7 +9,7 @@ import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from 'prisma/prisma.service';
 import { EmailService } from '../email/email.service';
 import * as bcrypt from 'bcrypt';  
-import { UnauthorizedException, ConflictException } from '@nestjs/common';
+import { UnauthorizedException, ConflictException, BadRequestException } from '@nestjs/common';
 
 
 const mockPrisma = {
@@ -67,6 +67,17 @@ describe('AuthService', () => {
 
       expect(result).toBe('johndoe1');
     });
+
+    it('should increment counter until a free username is found', async () => {
+      mockPrisma.user.findUnique
+        .mockResolvedValueOnce({ id: '1' }) // 'johndoe' is taken
+        .mockResolvedValueOnce({ id: '2' }) // 'johndoe1' is taken
+        .mockResolvedValueOnce(null);        // 'johndoe2' is free
+
+      const result = await (service as any).generateUniqueUsername('John Doe');
+
+      expect(result).toBe('johndoe2');
+    });
   });
 
   describe('findOrCreateOAuthUser', () => {
@@ -86,6 +97,25 @@ describe('AuthService', () => {
 
       expect(result).toBe(existingUser);
       expect(mockPrisma.user.create).not.toHaveBeenCalled();
+    });
+
+    it('should link googleId to existing account when email already exists', async () => {
+      const existingUser = { id: '2', email: 'john@example.com' };
+      mockPrisma.user.findUnique
+        .mockResolvedValueOnce(null)          // no user with this googleId
+        .mockResolvedValueOnce(existingUser); // user with this email exists
+
+      const updatedUser = { ...existingUser, googleId: 'google-123' };
+      mockPrisma.user.update.mockResolvedValue(updatedUser);
+
+      const result = await service.findOrCreateOAuthUser(oauthData);
+
+      expect(mockPrisma.user.update).toHaveBeenCalledWith({
+        where: { email: 'john@example.com' },
+        data: { googleId: 'google-123' },
+      });
+      expect(mockPrisma.user.create).not.toHaveBeenCalled();
+      expect(result).toBe(updatedUser);
     });
 
     it('should create a new user if no existing account is found', async () => {
@@ -137,7 +167,7 @@ describe('AuthService', () => {
     })
 
     it('should login user', async () =>{
-      mockPrisma.user.findUnique.mockResolvedValue({ id: '3', email: 'john@example.com', password: 'hashedpass' });
+      mockPrisma.user.findUnique.mockResolvedValue({ id: '3', email: 'john@example.com', password: 'hashedpass', totalXP: 0, isEmailVerified: false });
 
       (bcrypt.compare as jest.Mock).mockResolvedValue(true);
 
@@ -145,6 +175,8 @@ describe('AuthService', () => {
 
       expect(result.token).toBe('mock-token');
       expect(result.user.email).toBe('john@example.com');
+      expect(result.user.totalXP).toBe(0);
+      expect(result.user.isEmailVerified).toBe(false);
     })
   });
   
@@ -184,6 +216,95 @@ describe('AuthService', () => {
       expect(result.token).toBe('mock-token');
       expect(result.user.email).toBe('john@example.com');
       expect(result.user.username).toBe('John Doe');
+    })
+  })
+  describe('verifyEmail', () => {
+    const token = 'token-123'
+
+    it('should throw error when verification token is incorrect', async() =>{
+      mockPrisma.user.findFirst.mockResolvedValue(null);
+
+      await expect(service.verifyEmail(token)).rejects.toThrow(BadRequestException);
+    })
+
+    it('should throw error if email is already verified', async() => {
+      mockPrisma.user.findFirst.mockResolvedValue({'id': 1, 'isEmailVerified': true});
+
+      await expect(service.verifyEmail(token)).rejects.toThrow(BadRequestException);
+    })
+
+    it('should throw error if token is expired', async() =>{
+      mockPrisma.user.findFirst.mockResolvedValue({
+        'id': 1, 
+        'isEmailVerified': false,
+        'emailVerificationExpires': new Date(Date.now() - 1000)
+      });
+
+      await expect(service.verifyEmail(token)).rejects.toThrow(BadRequestException);
+    })
+
+    it('should verify users using email verification', async() => {
+      mockPrisma.user.findFirst.mockResolvedValue({
+        'id': 1, 
+        'isEmailVerified': false,
+        'emailVerificationExpires': new Date(Date.now() + 1000)
+      });
+
+      mockPrisma.user.update.mockResolvedValue({
+        'id': 1, 
+        'email': 'john@example.com',
+        'username': 'johndoe',
+        'totalXP': 0,
+        'isEmailVerified': true,
+        'emailVerificationToken': null,
+        'emailVerificationExpires': null
+      });
+
+      const result = await service.verifyEmail(token);
+
+      expect(result.message).toBe('Email verified successfully');
+      expect(result.token).toBe('mock-token');
+      expect(result.user.email).toBe('john@example.com');
+      expect(result.user.isEmailVerified).toBe(true);
+    })
+  })
+  describe('resendVerificationEmail', () => {
+    const email = 'john@example.com'
+
+    it('should throw error when user is not found', async() =>{  
+      mockPrisma.user.findUnique.mockResolvedValue(null);
+
+      await expect(service.resendVerificationEmail(email)).rejects.toThrow(BadRequestException);
+    })
+
+    it('should throw error if email is already verified', async () =>{
+      mockPrisma.user.findUnique.mockResolvedValue({
+        'id': 1,
+        'isEmailVerified': true
+      });
+
+      await expect(service.resendVerificationEmail(email)).rejects.toThrow(BadRequestException);
+    })
+
+    it('should send verification email', async () =>{
+      mockPrisma.user.findUnique.mockResolvedValue({
+        'id': 1,
+        'email': email,
+        'username': 'johndoe',
+        'isEmailVerified': false
+      });
+
+      mockPrisma.user.update.mockResolvedValue({});
+
+      const result = await service.resendVerificationEmail(email);
+
+      expect(mockEmail.sendVerificationEmail).toHaveBeenCalledWith(
+        'john@example.com',
+        'johndoe',
+        expect.any(String),
+        'signup',
+      );
+      expect(result.message).toBe('Verification email sent');
     })
   })
 });
