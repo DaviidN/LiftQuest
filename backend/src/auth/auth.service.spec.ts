@@ -44,14 +44,13 @@ describe('AuthService', () => {
 
     service = module.get<AuthService>(AuthService);
 
-    // Reset all mocks before each test
     jest.resetAllMocks();
     mockJwt.sign.mockReturnValue('mock-token');
   });
 
   describe('generateUniqueUsername', () => {
     it('should return slugified username when it is not taken', async () => {
-      mockPrisma.user.findUnique.mockResolvedValue(null); // username not taken
+      mockPrisma.user.findUnique.mockResolvedValue(null);
 
       const result = await (service as any).generateUniqueUsername('John Doe');
 
@@ -60,8 +59,8 @@ describe('AuthService', () => {
 
     it('should append a number when username is already taken', async () => {
       mockPrisma.user.findUnique
-        .mockResolvedValueOnce({ id: '1' }) // 'johndoe' is taken
-        .mockResolvedValueOnce(null);        // 'johndoe1' is free
+        .mockResolvedValueOnce({ id: '1' })
+        .mockResolvedValueOnce(null);
 
       const result = await (service as any).generateUniqueUsername('John Doe');
 
@@ -70,9 +69,9 @@ describe('AuthService', () => {
 
     it('should increment counter until a free username is found', async () => {
       mockPrisma.user.findUnique
-        .mockResolvedValueOnce({ id: '1' }) // 'johndoe' is taken
-        .mockResolvedValueOnce({ id: '2' }) // 'johndoe1' is taken
-        .mockResolvedValueOnce(null);        // 'johndoe2' is free
+        .mockResolvedValueOnce({ id: '1' })
+        .mockResolvedValueOnce({ id: '2' })
+        .mockResolvedValueOnce(null);
 
       const result = await (service as any).generateUniqueUsername('John Doe');
 
@@ -102,8 +101,8 @@ describe('AuthService', () => {
     it('should link googleId to existing account when email already exists', async () => {
       const existingUser = { id: '2', email: 'john@example.com' };
       mockPrisma.user.findUnique
-        .mockResolvedValueOnce(null)          // no user with this googleId
-        .mockResolvedValueOnce(existingUser); // user with this email exists
+        .mockResolvedValueOnce(null)
+        .mockResolvedValueOnce(existingUser);
 
       const updatedUser = { ...existingUser, googleId: 'google-123' };
       mockPrisma.user.update.mockResolvedValue(updatedUser);
@@ -120,9 +119,9 @@ describe('AuthService', () => {
 
     it('should create a new user if no existing account is found', async () => {
       mockPrisma.user.findUnique
-        .mockResolvedValueOnce(null)  // no user with this googleId
-        .mockResolvedValueOnce(null)  // no user with this email
-        .mockResolvedValueOnce(null); // username 'johndoe' is free
+        .mockResolvedValueOnce(null)
+        .mockResolvedValueOnce(null)
+        .mockResolvedValueOnce(null);
 
       const newUser = { id: '2', email: 'john@example.com', username: 'johndoe' };
       mockPrisma.user.create.mockResolvedValue(newUser);
