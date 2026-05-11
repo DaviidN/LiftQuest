@@ -235,6 +235,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           <div>
             <Button
               variant="ghost"
+              fullWidth
               onClick={() => { window.location.href = `${import.meta.env.VITE_API_URL || 'http://localhost:3001/api'}/auth/google`}}
             >
               <GoogleIcon/>
