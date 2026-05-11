@@ -23,7 +23,6 @@ export declare class UsersService {
         password: string | null;
         id: string;
         googleId: string | null;
-        appleId: string | null;
         provider: string;
         avatarUrl: string | null;
         totalXP: number;
