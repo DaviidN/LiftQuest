@@ -13,14 +13,11 @@ RUN npm install
 # Copy source code
 COPY . .
 
-# Generate Prisma Client (bust cache: 2026-05-11)
-RUN npx prisma generate
-
 # Build the application
 RUN npm run build
 
 # Expose port
 EXPOSE 3001
 
-# Start command (will be overridden by docker-compose)
-CMD until npx prisma migrate deploy; do echo "DB not ready, retrying in 5s..."; sleep 5; done && node dist/src/main.js
+# Start command: generate client, wait for DB, apply migrations, start app
+CMD npx prisma generate && until npx prisma migrate deploy; do echo "DB not ready, retrying in 5s..."; sleep 5; done && node dist/src/main.js
