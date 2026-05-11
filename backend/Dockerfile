@@ -13,7 +13,7 @@ RUN npm install
 # Copy source code
 COPY . .
 
-# Generate Prisma Client
+# Generate Prisma Client (bust cache: 2026-05-11)
 RUN npx prisma generate
 
 # Build the application
