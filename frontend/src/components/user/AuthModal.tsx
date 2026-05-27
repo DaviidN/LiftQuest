@@ -123,12 +123,13 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           {mode === 'signup' && (
             <div>
-              <label className="block text-sm font-medium mb-2 text-gray-300">
+              <label htmlFor="username" className="block text-sm font-medium mb-2 text-gray-300">
                 Username
               </label>
               <div className="relative">
                 <User size={20} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
                 <Input
+                  id="username"
                   type="text"
                   auth
                   placeholder="johndoe"
@@ -149,12 +150,13 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           )}
 
           <div>
-            <label className="block text-sm font-medium mb-2 text-gray-300">
+            <label htmlFor="email" className="block text-sm font-medium mb-2 text-gray-300">
               Email
             </label>
             <div className="relative">
               <Mail size={20} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
               <Input
+                id="email"
                 type="email"
                 placeholder="your@email.com"
                 value={email}
@@ -173,12 +175,13 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-2 text-slate-300">
+            <label htmlFor="password" className="block text-sm font-medium mb-2 text-slate-300">
               Password
             </label>
             <div className="relative">
               <Lock size={28} className="absolute left-2 top-1/2 -translate-y-1/2 p-1 rounded-xl text-slate-400"/>
               <Input
+                id="password"
                 auth
                 type={ showPassword ? "text" : "password"}
                 placeholder="••••••••"

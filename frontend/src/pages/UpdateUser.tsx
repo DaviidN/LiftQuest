@@ -166,10 +166,11 @@ export const UpdateUser = () => {
                         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
                             {field === 'password' && (
                                 <div className="flex flex-col gap-1">
-                                    <label className="text-sm text-slate-400">Current Password</label>
+                                    <label htmlFor="current-password" className="text-sm text-slate-400">Current Password</label>
                                     <div className="relative">
                                         <Lock size={28} className="absolute left-2 top-1/2 -translate-y-1/2 p-1 rounded-xl text-slate-400"/>
                                         <Input
+                                            id="current-password"
                                             type={showCurrentPassword ? 'text' : 'password'}
                                             value={currentPassword}
                                             disabled={status === 'loading'}
@@ -198,10 +199,11 @@ export const UpdateUser = () => {
                             )}
 
                             <div className="flex flex-col gap-1 relative">
-                                <label className="text-sm text-slate-400">{FIELD_LABELS[field]}</label>
+                                <label htmlFor="main-field" className="text-sm text-slate-400">{FIELD_LABELS[field]}</label>
                                 <div className="relative">
                                     <IconComponent size={28} className="absolute left-2 top-1/2 -translate-y-1/2 p-1 rounded-xl text-slate-400"/>
                                     <Input
+                                        id="main-field"
                                         type={(field === 'password' || field === 'password_reset') ? (showPassword ? 'text' : 'password') : (field === 'email' || field === 'request') ? 'email' : 'text'}
                                         value={value}
                                         disabled={status === 'loading'}
@@ -240,10 +242,11 @@ export const UpdateUser = () => {
 
                             {(field === 'password' || field === 'email' || field === 'password_reset') && (
                                 <div className="flex flex-col gap-1">
-                                    <label className="text-sm text-slate-400">{field === 'email' ? "Password for confirmation " : "Confirm New Password"}</label>
+                                    <label htmlFor="confirm-password" className="text-sm text-slate-400">{field === 'email' ? "Password for confirmation " : "Confirm New Password"}</label>
                                     <div className="relative">
                                         <Lock size={28} className="absolute left-2 top-1/2 -translate-y-1/2 p-1 rounded-xl text-slate-400"/>
                                         <Input
+                                            id="confirm-password"
                                             type="password"
                                             value={confirmPassword}
                                             disabled={status === 'loading'}

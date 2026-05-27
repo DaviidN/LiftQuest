@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { X, Mail, User, Trash2, Lock } from "lucide-react";
+import { X, Mail, User, Trash2, Lock, MailCheck } from "lucide-react";
 import { Button } from "../UI/Button";
 import { useAuth } from "../../context/userSessContext";
 import { useLocation } from "wouter";
@@ -14,8 +14,20 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 }) => {
     
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+    const [resendStatus, setResendStatus] = useState<'idle' | 'loading' | 'sent' | 'error'>('idle');
     const [, setLocation] = useLocation();
     const { userSess, setUserSess } = useAuth();
+
+    const handleResendVerification = async () => {
+        if (!userSess?.email) return;
+        setResendStatus('loading');
+        try {
+            await api.resendVerificationEmail(userSess.email);
+            setResendStatus('sent');
+        } catch {
+            setResendStatus('error');
+        }
+    };
 
     const handleDeleteProfile = async () =>{
         try{
@@ -57,17 +69,47 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                             <div>
                                 <p className="text-sm text-slate-400 mb-1">Email</p>
                                 <p className="font-medium">{userSess?.email}</p>
+                                {!userSess?.isEmailVerified && (
+                                    <p className="text-xs text-yellow-400 mt-0.5">Not verified</p>
+                                )}
                             </div>
                         </div>
-                        <Button 
-                            size="sm" 
+                        <Button
+                            size="sm"
                             variant="ghost"
                             onClick={() => setLocation("/update-user?field=email")}
-                            >    
+                            >
                             Update
                         </Button>
                     </div>
-                </div>    
+                </div>
+                {!userSess?.isEmailVerified && (
+                    <div className="bg-slate-700/50 rounded-lg p-4 mb-3">
+                        <div className="flex items-start justify-between">
+                            <div className="flex items-start gap-3 flex-1">
+                                <MailCheck size={20} className="text-yellow-400 mt-0.5" />
+                                <div>
+                                    <p className="text-sm text-slate-400 mb-1">Email verification</p>
+                                    {resendStatus === 'sent' ? (
+                                        <p className="text-sm text-green-400">Verification email sent!</p>
+                                    ) : resendStatus === 'error' ? (
+                                        <p className="text-sm text-red-400">Failed to send. Try again.</p>
+                                    ) : (
+                                        <p className="text-sm text-slate-300">Your email is not verified yet.</p>
+                                    )}
+                                </div>
+                            </div>
+                            <Button
+                                size="sm"
+                                variant="ghost"
+                                onClick={handleResendVerification}
+                                disabled={resendStatus === 'loading' || resendStatus === 'sent'}
+                            >
+                                {resendStatus === 'loading' ? 'Sending...' : resendStatus === 'sent' ? 'Sent' : 'Resend'}
+                            </Button>
+                        </div>
+                    </div>
+                )}
                 <div className="bg-slate-700/50 rounded-lg p-4">
                     <div className="flex items-start justify-between">
                         <div className="flex items-start gap-3 flex-1">

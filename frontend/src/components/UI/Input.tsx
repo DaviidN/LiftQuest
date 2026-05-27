@@ -12,6 +12,7 @@ interface InputProps {
   type?: string;
   auth?: boolean;
   className?: string;
+  id?: string;
 }
 
 export const Input: React.FC<InputProps> = ({
@@ -23,6 +24,7 @@ export const Input: React.FC<InputProps> = ({
   placeholder,
   min,
   max,
+  id,
   type = 'text',
   auth = false,
   className,
@@ -54,6 +56,7 @@ export const Input: React.FC<InputProps> = ({
         onChange={onChange}
         onFocus={onFocus}
         onBlur={onBlur}
+        id={id}
         className={`w-full flex-1 bg-slate-600 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all ${className}`}
     />
     );
